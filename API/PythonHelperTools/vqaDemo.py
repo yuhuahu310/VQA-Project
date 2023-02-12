@@ -17,14 +17,14 @@ print(f"Images are at {imgDir}")
 # initialize VQA api for QA annotations
 vqa=VQA(annFile)		
 # load and display QA annotations for given answer types
-"""
+"""	
 ansTypes can be one of the following
 yes/no
 number
 other
 unanswerable
 """
-anns = vqa.getAnns(ansTypes='yes/no');   
+anns = vqa.getAnns(ansTypes='yes/no');	   
 randomAnn = random.choice(anns)	
 vqa.showQA([randomAnn])
 imgFilename = randomAnn['image']
