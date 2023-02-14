@@ -83,15 +83,16 @@ def analysis_questions():
     print(l)
     cur_fig = plt.figure(figsize=(10, 8), dpi=100)
     cur_fig = sns.displot(data=l, x="lexical_diversity_score", kde=True)
+    cur_fig.set(yscale='log')
     fig = cur_fig.fig
-    fig.savefig(f"{savefigDir}/lexical_diversity_kde.png")
+    fig.savefig(f"{savefigDir}/questions_lexical_diversity_kde.png")
     plt.close()
 
     # bivariate kde plot
     cur_fig = plt.figure(figsize=(10, 8), dpi=100)
     cur_fig = sns.displot(data=l, x="length_of_question", y="lexical_diversity_score",kind="kde", rug=True)
     fig = cur_fig.fig
-    fig.savefig(f"{savefigDir}/lexical_diversity_kde_bivariate.png")
+    fig.savefig(f"{savefigDir}/questions_lexical_diversity_kde_bivariate.png")
     plt.close()
 
 analysis_questions()
