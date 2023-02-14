@@ -40,9 +40,10 @@ def num_unsuitable(anno):
     return count
 
 def analysis_images():
-    # unsuitable_cnt = [num_unsuitable(ann) for ann in anns]
-    # filtered = [cnt for cnt in unsuitable_cnt if cnt > 0]
-    # print("Percentage of images that are considered unsuitable by at least 1 annotators:", len(filtered) / len(unsuitable_cnt)*100)
+    # statistics of low-quality images
+    unsuitable_cnt = [num_unsuitable(ann) for ann in anns]
+    filtered = [cnt for cnt in unsuitable_cnt if cnt > 0]
+    print("Percentage of images that are considered unsuitable by at least 1 annotators:", len(filtered) / len(unsuitable_cnt)*100)
     
     # image diversity
     imlist = [os.path.join(imgDir, anno["image"]) for anno in anns]
@@ -54,18 +55,10 @@ def analysis_images():
         print(f"{cnt} out of {N}")
         img_arr = io.imread(img)
         img_arr = resize(img_arr, (img_shape[0], img_shape[1]))
-        print(img_arr)
         avg_arr += img_arr
         cnt += 1
-        if cnt == 6:
-            break
     avg_arr /= N
-    print(avg_arr)
-    io.imsave(f"{savefigDir}/avg_img_test.png", avg_arr)
+    io.imsave(f"{savefigDir}/avg_img.png", avg_arr)
 
-# def analysis_answers(): 
-#     answers = [ann['answers'] for ann in anns]
-#     print(answers)
-#     pass
 
 analysis_images()
