@@ -52,7 +52,7 @@ def distribution_of_ans():
 def analysis_answers():
     tokenizer = RegexpTokenizer(r'\w+')
 
-    # Distribution of answers
+    # Distribution of answers based on expected answer type
     temp1 = pd.DataFrame(distribution_of_ans(), columns=["Answer_Type", "Freq"])
     # cur_fig = plt.figure(figsize=(10, 8), dpi=100)
     cur_fig = sns.barplot(temp1,x='Answer_Type',y='Freq',palette='mako')
@@ -62,8 +62,46 @@ def analysis_answers():
     fig.savefig(f"{savefigDir}/answer_type_dist.png")
     plt.close()
 
+    # Retriving all answers
     raw_dist = [j for (i,j) in distribution_of_ans()]
     print(f"Percentage of Unanswerable over all answers: {raw_dist[3]/sum(raw_dist)}")
+    answers = [ann["answers"] for ann in anns]
+    flat_answers = [item for sublist in answers for item in sublist]
+    # print(flat_answers)
+    flat_answers = [tokenizer.tokenize(i['answer']) for i in flat_answers]
+    # answers = [answer for ann in anns for answer in ann]
+    # print(flat_answers)
+
+    # Answer Length
+    q_lens = answer_length_hist(flat_answers)
+    fig = plt.figure()
+    plt.hist(q_lens, bins=50)
+    plt.xlabel("answer_length")
+    plt.ylabel("freq")
+    plt.title("Frequency of Answers Length Histogram")
+    # plt.show()
+    fig.savefig(f"{savefigDir}/answers_length_hist.png")
+    plt.close()
+
+    # lexical diversity kde plot 
+    l = lexical_diversity(flat_answers)
+    print(l)
+    cur_fig = plt.figure(figsize=(10, 8), dpi=100)
+    cur_fig = sns.displot(data=l, x="lexical_diversity_score", kde=True)
+    cur_fig.set(yscale='symlog')
+    fig = cur_fig.fig
+    fig.savefig(f"{savefigDir}/answers_lexical_diversity_kde.png")
+    plt.close()
+
+    # bivariate kde plot
+    cur_fig = plt.figure(figsize=(10, 8), dpi=100)
+    cur_fig = sns.displot(data=l, x="length_of_answer", y="lexical_diversity_score",kind="kde", rug=True)
+    ax = plt.gca()
+    ax.set_xlim([0, 15])
+    ax.set_ylim([0.9,1.1])
+    fig = cur_fig.fig
+    fig.savefig(f"{savefigDir}/answers_lexical_diversity_kde_bivariate.png")
+    plt.close()
 
     return
 
