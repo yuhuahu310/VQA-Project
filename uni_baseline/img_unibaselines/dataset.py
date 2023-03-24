@@ -1,38 +1,32 @@
-from ...API.PythonHelper.vqaTools.vqa import VQA
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, Dataset
+import os
+import skimage.io as io
+from skimage.transform import resize
+from nltk.tokenize import RegexpTokenizer
+import numpy as np
+import sys
+sys.path.insert(0, '../../vqaTools')
+from vqa import VQA
 
 
-
-#
-# # Load dataset
-# vqa = VQA(annotation_file='v2_mscoco_train2014_annotations.json')
-# anns = vqa.getAnns(ansTypes=['yes/no'])
-# questions = [ann['question'] for ann in anns]
-# answers = [ann['answers'][0]['answer'] for ann in anns]  # TODO: deal with multiple answers
-# data = list(zip(questions, answers))
-# train_data, val_data = data[:int(0.8 * len(data))], data[int(0.8 * len(data)):]
-#
-# # Tokenize text
-# from nltk.tokenize import word_tokenize
-# from collections import Counter
-#
-# words = [word_tokenize(q.lower()) for q, a in train_data]
-# word_freq = Counter([w for q in words for w in q])
-# vocab = sorted(word_freq, key=word_freq.get, reverse=True)
-# vocab_to_int = {word: i + 1 for i, word in enumerate(vocab)}
-# train_tokens = [[vocab_to_int[w] for w in q] for q in words]
-# train_labels = [1 if a == 'yes' else 0 for q, a in train_data]
-
-
-# Create PyTorch DataLoader
 class VQADataset(Dataset):
-    def __init__(self, vqa):
-        self.vqa = vqa
-        self.vocab = self.vqa.get_vocab()
+    def __init__(self, ds_path, phase):
+        '''
 
+        :param ds_path: path to directory that contains Annotations, train, val, test
+        :param phase: train, val, or test
+        '''
+        self.vqa = VQA(annotation_file=os.path.join(ds_path, 'Annotations', f'{phase}.json'))
+        # Get vocabulary using training data
+        if phase == 'train':
+            self.vocab = self.vqa.get_vocab()
+        else:
+            self.vocab = VQA(annotation_file=os.path.join(ds_path, 'Annotations/train.json')).get_vocab()
+        self.ds_path = ds_path
+        self.phase = phase
 
     def __len__(self):
         return len(self.vqa.dataset)
@@ -41,30 +35,21 @@ class VQADataset(Dataset):
         qa_pair = self.vqa.dataset[idx]
         image_id = qa_pair['image']
         answers = qa_pair['answers']
-
-        # TODO: preprocess question and answers
-
+        question = qa_pair['question']
 
         # Get image and convert to tensor
-        image_tensor = torch.tensor()
+        img_fpath = os.path.join(self.ds_path, self.phase, image_id)
+        img_arr = io.imread(img_fpath)
+        img_arr = resize(img_arr, (800, 600))
+        img_tensor = torch.tensor(img_arr)
 
-        # Convert answers to one-hot vectors
+        # TODO: Convert answers and questions to one-hot vectors
         answer_vocab = self.vqa.get_answers_vocab()
         answer_vec = torch.zeros(len(answer_vocab))
         for ans in answers:
             ans_idx = answer_vocab[ans['answer']]
             answer_vec[ans_idx] = 1
 
-        return image_tensor, answer_vec
 
+        return img_tensor
 
-# Instantiate VQA class and VQADataset
-vqa = VQA(annotation_file='../../Annotations/val.json')
-vqa_dataset = VQADataset(vqa)
-print(len(vqa_dataset))
-
-
-#
-# # Instantiate DataLoader
-# batch_size = 32
-# vqa_dataloader = DataLoader(vqa_dataset, batch_size=batch_size, shuffle=True)

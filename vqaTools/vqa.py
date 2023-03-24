@@ -19,6 +19,8 @@ __version__ = '1.0'
 import json
 import datetime
 import copy
+from nltk.tokenize import RegexpTokenizer
+import numpy as np
 
 class VQA:
 	def __init__(self, annotation_file=None):
@@ -73,4 +75,13 @@ class VQA:
 			print('\n'.join([x['answer'] for x in ann['answers']]))
 
 	def get_vocab(self):
+		tokenizer = RegexpTokenizer(r'\w+')
+		word_list = []
+		for qa_pair in self.dataset:
+			word_list += tokenizer.tokenize(qa_pair['question'])
+			for ans in qa_pair['answers']:
+				word_list += tokenizer.tokenize(ans['answer'])
+		word_list = np.array(word_list)
+		word_list = np.unique(word_list)
+		return word_list
 		
