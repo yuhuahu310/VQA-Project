@@ -71,3 +71,6 @@ class VQA:
 			print("Question: %s"%ann['question'])
 			print("Answer: ")
 			print('\n'.join([x['answer'] for x in ann['answers']]))
+
+	def get_vocab(self):
+		
