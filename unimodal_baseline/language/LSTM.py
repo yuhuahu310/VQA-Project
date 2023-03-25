@@ -5,20 +5,70 @@ import torch.optim as optim
 from torch.utils.data import DataLoader, Dataset
 
 
-class LSTM(nn.Module):
-    def __init__(self, vocab_size, embedding_dim, hidden_dim, output_dim, n_layers, dropout):
-        super().__init__()
+# class LSTM(nn.Module):
+#     def __init__(self, vocab_size, embedding_dim, hidden_dim, output_dim, n_layers, dropout):
+#         super().__init__()
         
-        self.embedding = nn.Embedding(vocab_size, embedding_dim)
-        self.lstm = nn.LSTM(embedding_dim, hidden_dim, num_layers=n_layers, dropout=dropout, batch_first=True)
-        self.fc = nn.Linear(hidden_dim, output_dim)
-        self.dropout = nn.Dropout(dropout)
+#         self.embedding = nn.Embedding(vocab_size, embedding_dim)
+#         self.lstm = nn.LSTM(embedding_dim, hidden_dim, num_layers=n_layers, dropout=dropout, batch_first=True)
+#         self.fc = nn.Linear(hidden_dim, output_dim)
+#         self.dropout = nn.Dropout(dropout)
         
-    def forward(self, text):
-        embedded = self.dropout(self.embedding(text))
-        output, (hidden, cell) = self.lstm(embedded)
-        hidden = self.dropout(hidden[-1,:,:])
-        return self.fc(hidden)
+#     def forward(self, text):
+#         embedded = self.dropout(self.embedding(text))
+#         output, (hidden, cell) = self.lstm(embedded)
+#         hidden = self.dropout(hidden[-1,:,:])
+#         return self.fc(hidden)
+
+# Set device to GPU if available, otherwise use CPU
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+# Define the encoder class
+class EncoderLSTM(nn.Module):
+    def __init__(self, input_size, hidden_size):
+        super(EncoderLSTM, self).__init__()
+        self.hidden_size = hidden_size
+        self.lstm = nn.LSTM(input_size, hidden_size)
+
+    def forward(self, input):
+        _, (hidden, cell) = self.lstm(input)
+        return hidden, cell
+
+# Define the decoder class
+class DecoderLSTM(nn.Module):
+    def __init__(self, input_size, hidden_size, output_size):
+        super(DecoderLSTM, self).__init__()
+        self.hidden_size = hidden_size
+        self.output_size = output_size
+        self.lstm = nn.LSTM(input_size, hidden_size)
+        self.linear = nn.Linear(hidden_size, output_size)
+
+    def forward(self, input, hidden, cell):
+        output, (hidden, cell) = self.lstm(input, (hidden, cell))
+        output = self.linear(output.squeeze(0))
+        return output, hidden, cell
+
+# Define the Seq2Seq class that combines the encoder and decoder
+class Seq2Seq(nn.Module):
+    def __init__(self, encoder, decoder):
+        super(Seq2Seq, self).__init__()
+        self.encoder = encoder
+        self.decoder = decoder
+
+    def forward(self, input, target):
+        encoder_hidden, encoder_cell = self.encoder(input)
+
+        decoder_input = torch.zeros((1, 1, self.decoder.input_size)).to(device)
+        decoder_hidden = encoder_hidden
+        decoder_cell = encoder_cell
+
+        loss = 0
+        for i in range(target.shape[0]):
+            decoder_output, decoder_hidden, decoder_cell = self.decoder(decoder_input, decoder_hidden, decoder_cell)
+            loss += nn.functional.cross_entropy(decoder_output, target[i])
+            decoder_input = target[i].unsqueeze(0).unsqueeze(0)
+
+        return loss
 
 
 # Hyperparameters
