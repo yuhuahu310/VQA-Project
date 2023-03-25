@@ -1,0 +1,7 @@
+nltk
+numpy
+pandas
+torch
+seaborn
+matplotlib
+scikit-image

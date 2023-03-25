@@ -7,8 +7,6 @@ import skimage.io as io
 from skimage.transform import resize
 from nltk.tokenize import RegexpTokenizer
 import numpy as np
-import sys
-sys.path.insert(0, '../../vqaTools')
 from vqa import VQA
 
 

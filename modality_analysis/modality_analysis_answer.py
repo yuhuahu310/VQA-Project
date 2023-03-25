@@ -1,21 +1,17 @@
-from vqaTools.vqa import VQA
-import random
-import skimage.io as io
+import sys
+sys.path.insert(0, '../dataloader')
+from vqa import VQA
 import matplotlib.pyplot as plt
-import os
-import nltk
 from nltk.tokenize import RegexpTokenizer
 import matplotlib.pyplot as plt
 import pandas as pd 
-from collections import Counter
-from PIL import Image
 import seaborn as sns
 
-dataDir='../../'
+dataDir='../data'
 split = 'val'
 annFile='%s/Annotations/%s.json'%(dataDir, split)
 imgDir = '%s/Images/%s/' %(dataDir, split)
-savefigDir = '%s/Figs/' %(dataDir)	
+savefigDir = 'fig/'
 
 print(f"Annotations are at {annFile}")
 print(f"Images are at {imgDir}")
