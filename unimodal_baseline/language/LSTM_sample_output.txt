@@ -1,0 +1,1048 @@
+        [Answer]: unanswerable from
+        [Target]: unanswerable
+[Question]: What color is this little dish
+        [Answer]: gold
+        [Target]: gold
+[Question]: What kind of vitamins are these
+        [Answer]: unanswerable
+        [Target]: acidophilus
+Eval Batch [60/68]
+[Question]: What is this
+        [Answer]: unanswerable pizza
+        [Target]: tablet
+[Question]: What is in this box
+        [Answer]: unanswerable
+        [Target]: unanswerable
+[Question]: What is this
+        [Answer]: unanswerable pizza
+        [Target]: lotion
+[Question]: What can you see in the picture
+        [Answer]: unanswerable audio word entsperren
+        [Target]: coffee mug
+[Question]: What does this say
+        [Answer]: unanswerable
+        [Target]: unanswerable
+[Question]: What product is this
+        [Answer]: unanswerable
+        [Target]: catalina dressing
+[Question]: What kind of frozen dinner is this
+        [Answer]: macaroni cheese saffron rice
+        [Target]: chicken tikka masala
+[Question]: Can you please read the temperature on this thermostat Thank you
+        [Answer]: unanswerable increase
+        [Target]: unanswerable
+[Question]: What flavor is this
+        [Answer]: unanswerable
+        [Target]: big easy bold
+[Question]: What is in the little bottle that is on the table
+        [Answer]: tech news today
+        [Target]: unanswerable
+Epoch [67/100], Average Training Loss: 1.0821
+Epoch [67/100], Average Validation Loss: 5.2992
+Batch [100/321], Loss: 0.5342
+Train Batch [100/321]
+[Question]: What is the expiry date on this cream
+        [Answer]: unanswerable 15 then rinse
+        [Target]: unanswerable
+[Question]: Can you tell me what s in front of me
+        [Answer]: grass
+        [Target]: grass
+[Question]: What are these two colognes please
+        [Answer]: unanswerable
+        [Target]: unanswerable
+[Question]: What is this
+        [Answer]: unanswerable holder
+        [Target]: cookbook
+[Question]: I can t tell what it is that I m holding
+        [Answer]: finger puppet
+        [Target]: finger puppet
+[Question]: What is this
+        [Answer]: unanswerable
+        [Target]: box
+[Question]: What color is the sweat shirt
+        [Answer]: grey stripes stripes
+        [Target]: grey
+[Question]: What is this
+        [Answer]: unanswerable
+        [Target]: unanswerable
+[Question]: If there s a phone in this picture can you tell me what color it is
+        [Answer]: no stripes yellow
+        [Target]: no
+[Question]: What is the number on this
+        [Answer]: 56
+        [Target]: 56
+Batch [200/321], Loss: 1.5946
+Train Batch [200/321]
+[Question]: What is this
+        [Answer]: unanswerable
+        [Target]: iced latte
+[Question]: What is this
+        [Answer]: unanswerable
+        [Target]: mechanical parts
+[Question]: What was the object I just took a picture of
+        [Answer]: cigarettes
+        [Target]: cigarettes
+[Question]: What is in this bottle
+        [Answer]: unanswerable
+        [Target]: shampoo
+[Question]: Is this a computer
+        [Answer]: no helper cheeseburger
+        [Target]: no
+[Question]: What is the title of this book
+        [Answer]: unanswerable
+        [Target]: olivias opposites
+[Question]: Is my light on And I have one other question Do you have to really work all night
+        [Answer]: yes x
+        [Target]: yes
+[Question]: What is this
+        [Answer]: unanswerable
+        [Target]: wine
+[Question]: What is in this can
+        [Answer]: unanswerable
+        [Target]: stainless steel wipes
+[Question]: Can anybody tell me the title of this book please
+        [Answer]: unanswerable inspiration
+        [Target]: unanswerable
+Batch [300/321], Loss: 0.8210
+Train Batch [300/321]
+[Question]: Can you tell me what this is
+        [Answer]: unanswerable fillets taxes due may 10 2012 2012
+        [Target]: cod fillets
+[Question]: Can you describe these flowers to me thank you
+        [Answer]: orange yellow flowers settle for your
+        [Target]: orange yellow flowers
+[Question]: What kind of frozen dinner is this
+        [Answer]: macaroni cheese left
+        [Target]: macaroni cheese
+[Question]: Which kind of soup is this
+        [Answer]: unanswerable on top off off
+        [Target]: unanswerable
+[Question]: Could you please tell me what item this is
+        [Answer]: duzzit antibacterial cleaner left left
+        [Target]: duzzit antibacterial cleaner
+[Question]: Is there text on this side of the blister pack and what do I if there is text there
+        [Answer]: unanswerable no more time super time half button off off right
+        [Target]: unanswerable
+[Question]: What is this
+        [Answer]: unanswerable pizza pizza
+        [Target]: flowers
+[Question]: What flavor and make of coffee is this please
+        [Answer]: tullys french roast left
+        [Target]: tullys french roast
+[Question]: it is there
+        [Answer]: unanswerable other side stand stand other button
+        [Target]: unanswerable
+[Question]: Dvd is this
+        [Answer]: unanswerable then rinse thoroughly repeat button off off use off
+        [Target]: unanswerable
+Eval Batch [60/68]
+[Question]: What is this
+        [Answer]: unanswerable
+        [Target]: tablet
+[Question]: What is in this box
+        [Answer]: unanswerable 4
+        [Target]: unanswerable
+[Question]: What is this
+        [Answer]: unanswerable
+        [Target]: lotion
+[Question]: What can you see in the picture
+        [Answer]: trees audio word entsperren entsperren
+        [Target]: coffee mug
+[Question]: What does this say
+        [Answer]: unanswerable not
+        [Target]: unanswerable
+[Question]: What product is this
+        [Answer]: unanswerable
+        [Target]: catalina dressing
+[Question]: What kind of frozen dinner is this
+        [Answer]: macaroni cheese
+        [Target]: chicken tikka masala
+[Question]: Can you please read the temperature on this thermostat Thank you
+        [Answer]: unanswerable super
+        [Target]: unanswerable
+[Question]: What flavor is this
+        [Answer]: unanswerable
+        [Target]: big easy bold
+[Question]: What is in the little bottle that is on the table
+        [Answer]: foot counter
+        [Target]: unanswerable
+Epoch [68/100], Average Training Loss: 1.0801
+Epoch [68/100], Average Validation Loss: 5.3830
+Batch [100/321], Loss: 1.2087
+Train Batch [100/321]
+[Question]: What type of drink is this
+        [Answer]: unanswerable
+        [Target]: unanswerable
+[Question]: Find this garnet in its color
+        [Answer]: unanswerable stripes
+        [Target]: unanswerable
+[Question]: What is this item
+        [Answer]: unanswerable
+        [Target]: yogurt mini pretzels
+[Question]: What s in the can
+        [Answer]: unanswerable
+        [Target]: unanswerable
+[Question]: What brand of ice cream is this
+        [Answer]: unanswerable
+        [Target]: unanswerable
+[Question]: Whats in the box
+        [Answer]: unanswerable
+        [Target]: unanswerable
+[Question]: What color is the phone
+        [Answer]: unanswerable yellow
+        [Target]: unanswerable
+[Question]: How much does this cost Thank you
+        [Answer]: 5 99 seconds
+        [Target]: 5 99
+[Question]: What is the expiration date
+        [Answer]: unanswerable 2012
+        [Target]: unanswerable
+[Question]: What does the screen say
+        [Answer]: unanswerable cluster 319254
+        [Target]: nothing
+Batch [200/321], Loss: 1.4845
+Train Batch [200/321]
+[Question]: Hi is this surface shiny Thank you
+        [Answer]: yes
+        [Target]: yes
+[Question]: What is this
+        [Answer]: unanswerable to radio
+        [Target]: beer orange
+[Question]: How much time is left on the timer
+        [Answer]: 0 17 seconds
+        [Target]: 0 17
+[Question]: What is that a bottle of
+        [Answer]: unanswerable
+        [Target]: unanswerable
+[Question]: Is there any what you can tell me what box that is I don t even know if I can take a picture of it right being a blind guy but I m doing my best Thanks
+        [Answer]: denture adhesive watch
+        [Target]: denture adhesive
+[Question]: What is this item
+        [Answer]: unanswerable
+        [Target]: unanswerable
+[Question]: What is this
+        [Answer]: unanswerable to radio
+        [Target]: slinky
+[Question]: What kind of tea is that
+        [Answer]: unanswerable
+        [Target]: unanswerable
+[Question]: What do you see in the picture
+        [Answer]: door
+        [Target]: unanswerable
+[Question]: What color was that shirt
+        [Answer]: purple as well
+        [Target]: purple
+Batch [300/321], Loss: 1.3512
+Train Batch [300/321]
+[Question]: Can you please tell me what this says
+        [Answer]: do not power off unplug your
+        [Target]: join us on march 21st
+[Question]: What is it
+        [Answer]: unanswerable soup
+        [Target]: wallet
+[Question]: What type of insect is this
+        [Answer]: unanswerable slice accepted challenge
+        [Target]: beetle
+[Question]: What color is this
+        [Answer]: blue
+        [Target]: grey black
+[Question]: This is abandoned
+        [Answer]: unanswerable
+        [Target]: unanswerable
+[Question]: What is this item
+        [Answer]: unanswerable
+        [Target]: unanswerable
+[Question]: What is the name of this product
+        [Answer]: unanswerable
+        [Target]: unanswerable
+[Question]: Hello there Can you please say in this photograph what the temperature ranges are on the dial Thank you
+        [Answer]: unanswerable top
+        [Target]: unanswerable
+[Question]: What color is this dress
+        [Answer]: blue black white
+        [Target]: black white
+[Question]: What kind of dog is that
+        [Answer]: unanswerable
+        [Target]: unanswerable
+Eval Batch [60/68]
+[Question]: What is this
+        [Answer]: unanswerable to top
+        [Target]: tablet
+[Question]: What is in this box
+        [Answer]: unanswerable
+        [Target]: unanswerable
+[Question]: What is this
+        [Answer]: unanswerable to phone
+        [Target]: lotion
+[Question]: What can you see in the picture
+        [Answer]: coke
+        [Target]: coffee mug
+[Question]: What does this say
+        [Answer]: unanswerable this game
+        [Target]: unanswerable
+[Question]: What product is this
+        [Answer]: unanswerable rotini
+        [Target]: catalina dressing
+[Question]: What kind of frozen dinner is this
+        [Answer]: macaroni
+        [Target]: chicken tikka masala
+[Question]: Can you please read the temperature on this thermostat Thank you
+        [Answer]: unanswerable super
+        [Target]: unanswerable
+[Question]: What flavor is this
+        [Answer]: unanswerable easy bold
+        [Target]: big easy bold
+[Question]: What is in the little bottle that is on the table
+        [Answer]: tech
+        [Target]: unanswerable
+Epoch [69/100], Average Training Loss: 1.0575
+Epoch [69/100], Average Validation Loss: 5.3728
+Batch [100/321], Loss: 1.1952
+Train Batch [100/321]
+[Question]: How much is this
+        [Answer]: unanswerable text button off
+        [Target]: unanswerable
+[Question]: What is this
+        [Answer]: unanswerable n seek
+        [Target]: unanswerable
+[Question]: What does it say here
+        [Answer]: unanswerable to quitter
+        [Target]: unanswerable
+[Question]: What is the title of this book
+        [Answer]: unanswerable impairment
+        [Target]: unanswerable
+[Question]: Where is this
+        [Answer]: house flower orange peace
+        [Target]: unanswerable
+[Question]: I ve got two kinds of cheese American and cheddar Which one is this
+        [Answer]: unanswerable super button decrease off
+        [Target]: unanswerable
+[Question]: Can you tell whats in the box now
+        [Answer]: no extremely other spray
+        [Target]: no
+[Question]: Can you tell me the sodium content level of this box of food
+        [Answer]: unanswerable from increase button decrease off
+        [Target]: unanswerable
+[Question]: What color is this hat
+        [Answer]: red as as white as
+        [Target]: unanswerable
+[Question]: What kind of pills are these
+        [Answer]: unanswerable maximum strength left
+        [Target]: azo standard maximum strength
+Batch [200/321], Loss: 1.7787
+Train Batch [200/321]
+[Question]: What is this
+        [Answer]: unanswerable hide
+        [Target]: unanswerable
+[Question]: How much does my check read
+        [Answer]: 125 58 text
+        [Target]: 125 58
+[Question]: What kind of coffee is this please
+        [Answer]: kahlua
+        [Target]: kahlua
+[Question]: What is it
+        [Answer]: unanswerable pizza
+        [Target]: car
+[Question]: What is this
+        [Answer]: unanswerable hide
+        [Target]: fairy
+[Question]: This is a bit of a higher shot
+        [Answer]: unanswerable super
+        [Target]: unanswerable
+[Question]: What brand is this
+        [Answer]: unanswerable
+        [Target]: silverwood
+[Question]: Is this light on
+        [Answer]: yes cheeseburger
+        [Target]: yes
+[Question]: Does this say
+        [Answer]: unanswerable pockets accessory organizer super
+        [Target]: unanswerable
+[Question]: What is this picture
+        [Answer]: unanswerable hide
+        [Target]: coca cola
+Batch [300/321], Loss: 0.7609
+Train Batch [300/321]
+[Question]: Please find the number of chairs in the hoarding cup
+        [Answer]: 2 text half
+        [Target]: 2
+[Question]: what is the name of this lotion
+        [Answer]: unanswerable
+        [Target]: unanswerable
+[Question]: Thank you can you please tell me what this is
+        [Answer]: popcorn chicken left left
+        [Target]: popcorn chicken
+[Question]: What s this money
+        [Answer]: unanswerable to water
+        [Target]: unanswerable
+[Question]: Can you tell what this item is
+        [Answer]: unanswerable
+        [Target]: box
+[Question]: What is this
+        [Answer]: unanswerable phone pizza pizza pizza
+        [Target]: trashcan
+[Question]: Yeah i d just like to know if there was a label on this bottle and if there was dosage information that can be seen thank you very much
+        [Answer]: unanswerable all whole half button button
+        [Target]: unanswerable
+[Question]: Can you please tell me what you can see
+        [Answer]: bedroom game
+        [Target]: bedroom
+[Question]: What is this
+        [Answer]: unanswerable fajitas pizza pizza
+        [Target]: tequila
+[Question]: What does this say
+        [Answer]: unanswerable game not not
+        [Target]: unanswerable
+Eval Batch [60/68]
+[Question]: What is this
+        [Answer]: unanswerable hide n
+        [Target]: tablet
+[Question]: What is in this box
+        [Answer]: unanswerable
+        [Target]: unanswerable
+[Question]: What is this
+        [Answer]: unanswerable to pizza pizza
+        [Target]: lotion
+[Question]: What can you see in the picture
+        [Answer]: peanut entsperren
+        [Target]: coffee mug
+[Question]: What does this say
+        [Answer]: unanswerable on not
+        [Target]: unanswerable
+[Question]: What product is this
+        [Answer]: unanswerable rotini
+        [Target]: catalina dressing
+[Question]: What kind of frozen dinner is this
+        [Answer]: macaroni
+        [Target]: chicken tikka masala
+[Question]: Can you please read the temperature on this thermostat Thank you
+        [Answer]: unanswerable button super super
+        [Target]: unanswerable
+[Question]: What flavor is this
+        [Answer]: unanswerable easy bold
+        [Target]: big easy bold
+[Question]: What is in the little bottle that is on the table
+        [Answer]: tech hide n
+        [Target]: unanswerable
+Epoch [70/100], Average Training Loss: 1.0979
+Epoch [70/100], Average Validation Loss: 5.4227
+Batch [100/321], Loss: 0.9779
+Train Batch [100/321]
+[Question]: What is this
+        [Answer]: unanswerable radio
+        [Target]: tv
+[Question]: What s in this bottle
+        [Answer]: unanswerable juice
+        [Target]: cranberry juice
+[Question]: I m trying to read the sticker on this card If it is shown on this photo what exactly does the sticker say and if there s any text on it
+        [Answer]: unanswerable almost no increase
+        [Target]: unanswerable
+[Question]: What is that
+        [Answer]: unanswerable dollar bill
+        [Target]: 20 dollar bill
+[Question]: What kind of vehicle is this I am in
+        [Answer]: unanswerable
+        [Target]: unanswerable
+[Question]: How many towels are on the shelf and what color are they
+        [Answer]: 5 blue number
+        [Target]: 5 blue
+[Question]: Can you read to me what is the item in this package
+        [Answer]: hershey kisses walking stick
+        [Target]: hershey kisses
+[Question]: What kind of candy bar is this
+        [Answer]: snickers hazelnut
+        [Target]: lindt hazelnut
+[Question]: What is that
+        [Answer]: unanswerable radio
+        [Target]: unanswerable
+[Question]: What is this
+        [Answer]: unanswerable dinner
+        [Target]: rug
+Batch [200/321], Loss: 1.2942
+Train Batch [200/321]
+[Question]: What is this in the screen
+        [Answer]: sky
+        [Target]: sky
+[Question]: What does my computer screen say
+        [Answer]: unanswerable failure
+        [Target]: logon process initialization failure
+[Question]: What is this
+        [Answer]: unanswerable
+        [Target]: carrots
+[Question]: what is this package
+        [Answer]: flash drive spray
+        [Target]: lysol disinfectant spray
+[Question]: Color of the flower
+        [Answer]: unanswerable stripes
+        [Target]: unanswerable
+[Question]: What is this Yeah I can t it though It vibrated Let s see It
+        [Answer]: unanswerable fry
+        [Target]: unanswerable
+[Question]: What is next Wednesday s date
+        [Answer]: unanswerable
+        [Target]: unanswerable
+[Question]: What s this
+        [Answer]: unanswerable
+        [Target]: dog
+[Question]: What is on this label
+        [Answer]: unanswerable acid
+        [Target]: dawn
+[Question]: What does this look like
+        [Answer]: unanswerable
+        [Target]: omelette
+Batch [300/321], Loss: 1.1232
+Train Batch [300/321]
+[Question]: color is this stone
+        [Answer]: unanswerable stripes
+        [Target]: unanswerable
+[Question]: Where is this sold
+        [Answer]: grocery store may you
+        [Target]: grocery store
+[Question]: What does the computer screen say
+        [Answer]: unanswerable alt failure to to
+        [Target]: cancel
+[Question]: What is the name of this game
+        [Answer]: fate
+        [Target]: unanswerable
+[Question]: What kind of wine do I have
+        [Answer]: unanswerable pink pink
+        [Target]: unanswerable
+[Question]: What color is this sweater
+        [Answer]: pink stripes stripes
+        [Target]: cream
+[Question]: What is this
+        [Answer]: unanswerable fits hide
+        [Target]: unanswerable
+[Question]: What kind of food is this
+        [Answer]: unanswerable yorkshire
+        [Target]: unanswerable
+[Question]: Where is my harry potter 2 dvd in spanish
+        [Answer]: unanswerable 2012 then
+        [Target]: unanswerable
+[Question]: Please tell me what my finger looks like Is it bleeding Or can you tell how bad I cut it
+        [Answer]: no stripes yes boots
+        [Target]: no
+Eval Batch [60/68]
+[Question]: What is this
+        [Answer]: unanswerable over to pizza
+        [Target]: tablet
+[Question]: What is in this box
+        [Answer]: unanswerable 4
+        [Target]: unanswerable
+[Question]: What is this
+        [Answer]: unanswerable 4 to pizza
+        [Target]: lotion
+[Question]: What can you see in the picture
+        [Answer]: unanswerable over
+        [Target]: coffee mug
+[Question]: What does this say
+        [Answer]: unanswerable not
+        [Target]: unanswerable
+[Question]: What product is this
+        [Answer]: unanswerable rotini
+        [Target]: catalina dressing
+[Question]: What kind of frozen dinner is this
+        [Answer]: macaroni
+        [Target]: chicken tikka masala
+[Question]: Can you please read the temperature on this thermostat Thank you
+        [Answer]: unanswerable super
+        [Target]: unanswerable
+[Question]: What flavor is this
+        [Answer]: unanswerable easy bold
+        [Target]: big easy bold
+[Question]: What is in the little bottle that is on the table
+        [Answer]: tech counter n
+        [Target]: unanswerable
+Epoch [71/100], Average Training Loss: 1.0584
+Epoch [71/100], Average Validation Loss: 5.3367
+Batch [100/321], Loss: 0.7250
+Train Batch [100/321]
+[Question]: What are these bottles for
+        [Answer]: perfume
+        [Target]: perfume
+[Question]: What is in the little bottle that is standing on the table If you can not see please explain how to fix the picture
+        [Answer]: unanswerable water
+        [Target]: unanswerable
+[Question]: Do the dark clouds look like rain clouds and are they grey
+        [Answer]: yes x number
+        [Target]: yes
+[Question]: What kind of soda is this
+        [Answer]: pepsi
+        [Target]: pepsi
+[Question]: Oh my God Maybe because there are letters on it maybe that s green and maybe the back is white then I don t know I don t care either but thank you anyway I appreciate it
+        [Answer]: unanswerable fry
+        [Target]: unanswerable
+[Question]: What does this say
+        [Answer]: unanswerable
+        [Target]: unanswerable
+[Question]: What s the computer screen say
+        [Answer]: windows failed to start
+        [Target]: windows failed to start
+[Question]: WHat does this windows xp error say
+        [Answer]: unanswerable whole page
+        [Target]: unanswerable
+[Question]: What color is this pepper
+        [Answer]: orange pink
+        [Target]: orange
+[Question]: What flavor of Pringles is this
+        [Answer]: unanswerable
+        [Target]: unanswerable
+Batch [200/321], Loss: 0.8360
+Train Batch [200/321]
+[Question]: What color is this slip
+        [Answer]: white
+        [Target]: white
+[Question]: What color is the nightstand
+        [Answer]: unanswerable
+        [Target]: unanswerable
+[Question]: What color is this hat
+        [Answer]: grey
+        [Target]: red
+[Question]: What s on this t shirt Please thank you
+        [Answer]: sin city vegas
+        [Target]: sin city
+[Question]: Could you please tell me what flavor of tea this is I know it s a glass jar and I know it s tea
+        [Answer]: unanswerable
+        [Target]: unanswerable
+[Question]: What is in the picture
+        [Answer]: unanswerable
+        [Target]: unanswerable
+[Question]: what is this
+        [Answer]: unanswerable to
+        [Target]: wine
+[Question]: What color is the fabric
+        [Answer]: grey yellow
+        [Target]: grey
+[Question]: Does this shirt and pants match
+        [Answer]: unanswerable helper cheeseburger
+        [Target]: unanswerable
+[Question]: What is this
+        [Answer]: unanswerable juice
+        [Target]: orange
+Batch [300/321], Loss: 1.5444
+Train Batch [300/321]
+[Question]: What is in this box
+        [Answer]: unanswerable pizza
+        [Target]: crumbed fillet fish
+[Question]: Please identify this frozen meal
+        [Answer]: unanswerable reach
+        [Target]: unanswerable
+[Question]: What is this drink
+        [Answer]: unanswerable pizza
+        [Target]: unanswerable
+[Question]: what is this
+        [Answer]: unanswerable fajitas to pizza
+        [Target]: unanswerable
+[Question]: What is this
+        [Answer]: unanswerable fajitas to pizza
+        [Target]: cappuccino
+[Question]: What is this
+        [Answer]: unanswerable fajitas to pizza
+        [Target]: fish
+[Question]: What is this item
+        [Answer]: unanswerable puzzle
+        [Target]: popping corn
+[Question]: Which DVD is this
+        [Answer]: out africa flower
+        [Target]: unanswerable
+[Question]: What is this
+        [Answer]: unanswerable pizza
+        [Target]: coffee cup
+[Question]: What does this say
+        [Answer]: unanswerable not
+        [Target]: unanswerable
+Eval Batch [60/68]
+[Question]: What is this
+        [Answer]: unanswerable to n seek
+        [Target]: tablet
+[Question]: What is in this box
+        [Answer]: unanswerable
+        [Target]: unanswerable
+[Question]: What is this
+        [Answer]: unanswerable to n seek
+        [Target]: lotion
+[Question]: What can you see in the picture
+        [Answer]: unanswerable audio word entsperren
+        [Target]: coffee mug
+[Question]: What does this say
+        [Answer]: unanswerable game
+        [Target]: unanswerable
+[Question]: What product is this
+        [Answer]: unanswerable
+        [Target]: catalina dressing
+[Question]: What kind of frozen dinner is this
+        [Answer]: macaroni cheese
+        [Target]: chicken tikka masala
+[Question]: Can you please read the temperature on this thermostat Thank you
+        [Answer]: unanswerable super time
+        [Target]: unanswerable
+[Question]: What flavor is this
+        [Answer]: unanswerable
+        [Target]: big easy bold
+[Question]: What is in the little bottle that is on the table
+        [Answer]: tech news today
+        [Target]: unanswerable
+Epoch [72/100], Average Training Loss: 1.0634
+Epoch [72/100], Average Validation Loss: 5.4135
+Batch [100/321], Loss: 1.2853
+Train Batch [100/321]
+[Question]: What is this
+        [Answer]: unanswerable fits
+        [Target]: unanswerable
+[Question]: What time is it on my set top box on my silver thing
+        [Answer]: unanswerable
+        [Target]: unanswerable
+[Question]: what s in this bottle
+        [Answer]: shampoo word entsperren
+        [Target]: shampoo
+[Question]: Describe any pattern you see in the table
+        [Answer]: unanswerable on
+        [Target]: unanswerable
+[Question]: What is this
+        [Answer]: unanswerable fits
+        [Target]: fan
+[Question]: What is this
+        [Answer]: unanswerable fits
+        [Target]: unanswerable
+[Question]: What does what does it say on this can
+        [Answer]: polar seltzer ryes
+        [Target]: polar seltzer
+[Question]: Please tell me which cans are what
+        [Answer]: corn peaches cat food
+        [Target]: corn peaches cat food
+[Question]: can you tell me what my weight is please thank you
+        [Answer]: unanswerable
+        [Target]: unanswerable
+[Question]: What is this
+        [Answer]: unanswerable fits
+        [Target]: calculator
+Batch [200/321], Loss: 1.7031
+Train Batch [200/321]
+[Question]: What is this thank you
+        [Answer]: authentic thai cuisine
+        [Target]: authentic thai cuisine
+[Question]: What brand of batteries are these
+        [Answer]: duracell
+        [Target]: duracell
+[Question]: What does this screen say
+        [Answer]: unanswerable swipe card
+        [Target]: unanswerable
+[Question]: What flavor coffee is this please
+        [Answer]: caramel drizzle cocoa
+        [Target]: caramel drizzle
+[Question]: what type of gatorade is this please
+        [Answer]: unanswerable
+        [Target]: unanswerable
+[Question]: What is in this can please
+        [Answer]: unanswerable
+        [Target]: unanswerable
+[Question]: Is this breeders blend or beef dinner
+        [Answer]: breeder blend
+        [Target]: breeders blend
+[Question]: What is this It s Italian Speak as you can
+        [Answer]: unanswerable
+        [Target]: unanswerable
+[Question]: What is this box
+        [Answer]: unanswerable
+        [Target]: cake
+[Question]: What kind of cereal bars are these
+        [Answer]: unanswerable
+        [Target]: unanswerable
+Batch [300/321], Loss: 1.0118
+Train Batch [300/321]
+[Question]: Is this tide high efficiency or low efficiency
+        [Answer]: unanswerable raisins
+        [Target]: unanswerable
+[Question]: Is this a box of cocoa
+        [Answer]: unanswerable pockets whole super
+        [Target]: unanswerable
+[Question]: What is this item
+        [Answer]: unanswerable puzzle
+        [Target]: hippie chips
+[Question]: What does that say
+        [Answer]: unanswerable 9 5x2 x 9 786
+        [Target]: 5x2 x 9 5x2 x 9 786
+[Question]: What is this
+        [Answer]: unanswerable to n seek
+        [Target]: unanswerable
+[Question]: what color is this dog
+        [Answer]: black
+        [Target]: black
+[Question]: What s in this picture
+        [Answer]: unanswerable to phone
+        [Target]: parking lot
+[Question]: What is this
+        [Answer]: unanswerable to n seek
+        [Target]: blanket
+[Question]: What is this can
+        [Answer]: unanswerable soup
+        [Target]: cream mushroom soup
+[Question]: What is the oven setting
+        [Answer]: 450 shape
+        [Target]: 350
+Eval Batch [60/68]
+[Question]: What is this
+        [Answer]: unanswerable to phone
+        [Target]: tablet
+[Question]: What is in this box
+        [Answer]: unanswerable sauce
+        [Target]: unanswerable
+[Question]: What is this
+        [Answer]: unanswerable to phone
+        [Target]: lotion
+[Question]: What can you see in the picture
+        [Answer]: unanswerable word entsperren
+        [Target]: coffee mug
+[Question]: What does this say
+        [Answer]: unanswerable game
+        [Target]: unanswerable
+[Question]: What product is this
+        [Answer]: unanswerable creme
+        [Target]: catalina dressing
+[Question]: What kind of frozen dinner is this
+        [Answer]: meat cheese masala pilau
+        [Target]: chicken tikka masala
+[Question]: Can you please read the temperature on this thermostat Thank you
+        [Answer]: unanswerable super time
+        [Target]: unanswerable
+[Question]: What flavor is this
+        [Answer]: unanswerable bold
+        [Target]: big easy bold
+[Question]: What is in the little bottle that is on the table
+        [Answer]: foot
+        [Target]: unanswerable
+Epoch [73/100], Average Training Loss: 1.0691
+Epoch [73/100], Average Validation Loss: 5.3826
+Batch [100/321], Loss: 0.8518
+Train Batch [100/321]
+[Question]: What is this
+        [Answer]: unanswerable fits hide n seek
+        [Target]: unanswerable
+[Question]: What is this
+        [Answer]: unanswerable fits hide n seek
+        [Target]: unanswerable
+[Question]: What is in this can
+        [Answer]: unanswerable
+        [Target]: unanswerable
+[Question]: What does this say
+        [Answer]: unanswerable seventh not quitter
+        [Target]: love
+[Question]: Can you please read me the text that is appearing this screen please
+        [Answer]: broadcom corporation shine your spray
+        [Target]: broadcom corporation
+[Question]: Is this a pen
+        [Answer]: yes cheeseburger macaroni
+        [Target]: yes
+[Question]: In front of you there s two coasters I need to know which one is salt and pepper Let me know with a left or right which is salt and which is pepper Alright thanks
+        [Answer]: unanswerable then button decrease
+        [Target]: unanswerable
+[Question]: What scent is this soap
+        [Answer]: unanswerable sport
+        [Target]: unanswerable
+[Question]: What is the setting on this dryer
+        [Answer]: regular then rinse
+        [Target]: unanswerable
+[Question]: What s that
+        [Answer]: dog n seek
+        [Target]: marker
+Batch [200/321], Loss: 1.1534
+Train Batch [200/321]
+[Question]: What color s this Does it have checks or no
+        [Answer]: grey yellow
+        [Target]: grey
+[Question]: Can you see what the temperature is set to
+        [Answer]: unanswerable
+        [Target]: unanswerable
+[Question]: What is this
+        [Answer]: unanswerable cream
+        [Target]: jamaica rum cream
+[Question]: What is this
+        [Answer]: unanswerable to
+        [Target]: ruler
+[Question]: What color is that candy that I am holding in my hand
+        [Answer]: red
+        [Target]: red
+[Question]: What is this
+        [Answer]: unanswerable to
+        [Target]: unanswerable
+[Question]: What DVD is it
+        [Answer]: cowboys aliens
+        [Target]: cowboys aliens
+[Question]: There are supposed to be two tops in this picture Are they the same color
+        [Answer]: yes x number
+        [Target]: yes
+[Question]: What is this
+        [Answer]: unanswerable to
+        [Target]: glass
+[Question]: Are the lights on or off I can t tell
+        [Answer]: on
+        [Target]: on
+Batch [300/321], Loss: 1.1247
+Train Batch [300/321]
+[Question]: What is this
+        [Answer]: unanswerable fits n seek
+        [Target]: unanswerable
+[Question]: Which pair of pants is khaki The left or the right
+        [Answer]: left right
+        [Target]: left
+[Question]: What kind of path is this
+        [Answer]: water
+        [Target]: pepsi
+[Question]: What number or letter in the picture
+        [Answer]: 400 then
+        [Target]: 400
+[Question]: What is this
+        [Answer]: unanswerable to phone
+        [Target]: mashed potatoes
+[Question]: What color is this device
+        [Answer]: black
+        [Target]: silver
+[Question]: What dollar amount is this
+        [Answer]: 5 text isnt skewed
+        [Target]: 5
+[Question]: can you tell me if this says any brand name or anything on it any ingredients basically what does this have on it picture and saying words something like that
+        [Answer]: unanswerable
+        [Target]: unanswerable
+[Question]: What type of deodorant is this
+        [Answer]: unanswerable hours sport impairment
+        [Target]: onduty 24 hours sport
+[Question]: Is there a number or wifi password on this router
+        [Answer]: unanswerable then rinse thoroughly
+        [Target]: unanswerable
+Eval Batch [60/68]
+[Question]: What is this
+        [Answer]: unanswerable hide n
+        [Target]: tablet
+[Question]: What is in this box
+        [Answer]: unanswerable
+        [Target]: unanswerable
+[Question]: What is this
+        [Answer]: unanswerable hide n
+        [Target]: lotion
+[Question]: What can you see in the picture
+        [Answer]: slider for word entsperren pizza
+        [Target]: coffee mug
+[Question]: What does this say
+        [Answer]: unanswerable diet
+        [Target]: unanswerable
+[Question]: What product is this
+        [Answer]: unanswerable creme
+        [Target]: catalina dressing
+[Question]: What kind of frozen dinner is this
+        [Answer]: macaroni cheese
+        [Target]: chicken tikka masala
+[Question]: Can you please read the temperature on this thermostat Thank you
+        [Answer]: unanswerable cool left
+        [Target]: unanswerable
+[Question]: What flavor is this
+        [Answer]: unanswerable bold
+        [Target]: big easy bold
+[Question]: What is in the little bottle that is on the table
+        [Answer]: tech news today
+        [Target]: unanswerable
+Epoch [74/100], Average Training Loss: 1.0508
+Epoch [74/100], Average Validation Loss: 5.4656
+Batch [100/321], Loss: 0.8864
+Train Batch [100/321]
+[Question]: What is this
+        [Answer]: unanswerable pizza
+        [Target]: wine
+[Question]: What temperature is the thermostat set to
+        [Answer]: unanswerable
+        [Target]: 75
+[Question]: I don t know what this is can you help me
+        [Answer]: air conditioner
+        [Target]: air conditioner
+[Question]: What is showing on the menu What is selected on the TV menu
+        [Answer]: unanswerable
+        [Target]: unanswerable
+[Question]: Could you please tell me what type of medication this is Thank you
+        [Answer]: unanswerable off
+        [Target]: unanswerable
+[Question]: What color is this shirt
+        [Answer]: white stripes as
+        [Target]: orange
+[Question]: what does this say
+        [Answer]: unanswerable body milk spring
+        [Target]: nivea body milk
+[Question]: What color is this
+        [Answer]: white
+        [Target]: grey black white
+[Question]: What is this
+        [Answer]: unanswerable beans country pizza
+        [Target]: green beans
+[Question]: What does the error message say on the printer
+        [Answer]: sleep
+        [Target]: sleep
+Batch [200/321], Loss: 1.0315
+Train Batch [200/321]
+[Question]: As has been requested from taking the previous photo and uploading it I ve turned the cam to the right Hopefully you can see the image clearly including the logo and the text and please identify what
+        [Answer]: unanswerable
+        [Target]: unanswerable
+[Question]: Hi I don t need you to read this I just need to know if this document is right side up or not Thank you
+        [Answer]: upside down
+        [Target]: upside down
+[Question]: What is this lotion bottle
+        [Answer]: jergens
+        [Target]: jergens
+[Question]: What is this
+        [Answer]: unanswerable
+        [Target]: chair
+[Question]: What s in this picture
+        [Answer]: unanswerable
+        [Target]: unanswerable
+[Question]: What is those
+        [Answer]: plant kleenex
+        [Target]: plant
+[Question]: What is this item
+        [Answer]: unanswerable
+        [Target]: unanswerable
+[Question]: What does this label say
+        [Answer]: unanswerable dragon
+        [Target]: unanswerable
+[Question]: What color is my shirt
+        [Answer]: grey stripes
+        [Target]: blue
+[Question]: What brand of lasagna is this and if you can see it what are the instructions
+        [Answer]: unanswerable deep fry
+        [Target]: unanswerable
+Batch [300/321], Loss: 0.8118
+Train Batch [300/321]
+[Question]: What s this
+        [Answer]: unanswerable fajitas pizza pizza
+        [Target]: unanswerable
+[Question]: What is the EQ number
+        [Answer]: unanswerable deep then to to repeat
+        [Target]: unanswerable
+[Question]: What is it
+        [Answer]: unanswerable counter pizza pizza pizza
+        [Target]: tape
+[Question]: What color is the strap on this thong sandal
+        [Answer]: black
+        [Target]: black
+[Question]: can you tell me or describe this t shirt
+        [Answer]: white horizontally top
+        [Target]: white
+[Question]: what is this
+        [Answer]: unanswerable pizza pizza
+        [Target]: tv remote
+[Question]: Is this air conditioner on air fan or dehumidifier
+        [Answer]: dehumidifier
+        [Target]: dehumidifier
+[Question]: What is this please
+        [Answer]: unanswerable lasagna pizza
+        [Target]: meat lasagna
+[Question]: What does this package say
+        [Answer]: unanswerable not
+        [Target]: burrito
+[Question]: what pizza is this
+        [Answer]: roasted vegetable goat cheese pizza
+        [Target]: roasted vegetable goat cheese
+^CTraceback (most recent call last):
+  File "/home/tianyu/Documents/CMU/11777/VQA-Project/unimodal_baseline/language/LSTM.py", line 200, in <module>
+    val_loss = eval(model, val_loader, criterion, qa_dataset_val)
+  File "/home/tianyu/Documents/CMU/11777/VQA-Project/unimodal_baseline/language/LSTM.py", line 167, in eval
+    labels = answers[1:].view(-1).type(torch.LongTensor).to(device)
+KeyboardInterrupt
+
+(11777) ➜  language git:(main) ✗ 
