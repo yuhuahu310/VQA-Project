@@ -33,7 +33,7 @@ def train_model(model_type, model_name, train_df, eval_df, source_max_token_len=
 def predict(model, questions, answers):
     for q, tg in zip(questions, answers):
         a = model.predict(q)[0]
-        print('[Question]: {}\n\t[Answer]: {}\n\t[Target]: {}'.format(q, a, tg.strip(" </s>")))
+        print('[Question]: {}\n\t[Answer]: {}\n\t[Target]: {}'.format(q, a, tg.replace(" </s>", "")))
 
 def predict_answers(df, mode, n_samples=30):
     samples = df.sample(n_samples, random_state=int(time.time()))
