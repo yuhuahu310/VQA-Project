@@ -71,7 +71,7 @@ class VQADataset(Dataset):
 
         q_vec = self._sent_2_idx_seq(question)
         a_vec = self._sent_2_idx_seq(answer)
-        return torch.tensor(q_vec, dtype=torch.int), torch.tensor(a_vec, dtype=torch.int), img_tensor
+        return img_tensor, torch.tensor(q_vec, dtype=torch.int), torch.tensor(a_vec, dtype=torch.int)
 
 
 
@@ -105,11 +105,11 @@ def collate_fn_pad(batch):
 
 
 def collate_fn_pad_image(batch):
-    questions = torch.nn.utils.rnn.pad_sequence([t[0] for t in batch], padding_value=2)
-    answers = torch.nn.utils.rnn.pad_sequence([t[1] for t in batch], padding_value=2)
-    img_list = [t[2] for t in batch]
+    questions = torch.nn.utils.rnn.pad_sequence([t[1] for t in batch], padding_value=2)
+    answers = torch.nn.utils.rnn.pad_sequence([t[2] for t in batch], padding_value=2)
+    img_list = [t[0] for t in batch]
     images = torch.stack(img_list, dim=0)
-    return questions, answers, images
+    return images, questions, answers
 
 
 if __name__ == '__main__':
