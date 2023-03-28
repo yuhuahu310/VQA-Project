@@ -21,7 +21,8 @@ class Trainer(object):
         self.optim = torch.optim.Adam(self.model.parameters(), self.learning_rate)
 
     def loss(self, predictions, labels):
-        return F.cross_entropy(predictions.reshape(-1, predictions.size(-1)), labels.reshape(-1), ignore_index=0)
+        labels = labels.long()
+        return F.cross_entropy(predictions.reshape(-1, predictions.size(-1)), labels.reshape(-1), ignore_index=2)
     
     def val(self):
         """
@@ -49,9 +50,11 @@ class Trainer(object):
         for i in range(self.num_epochs):
             epoch_loss = 0
             num_batches = 0
+            i = 0
             for batch in self.train_dataloader:
+                print("batch i: ", i)
+                i += 1
                 features, questions, answers = batch[0].to(self.device), batch[1].to(self.device), batch[2].to(self.device)
-                import pdb; pdb.set_trace()
                 logits = self.model(features, answers[:, :-1])
 
                 loss = self.loss(logits, answers[:, 1:])

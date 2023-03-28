@@ -31,9 +31,9 @@ train_dataset = VQADataset("../../data", "train")
 qa_dataset_val = VQADataset("../../data", "val")
 
 VOCAB_SIZE = len(train_dataset.vocab)
-ENC_EMB_DIM = 256
+ENC_EMB_DIM = 1000
 DEC_EMB_DIM = 256
-HID_DIM = 512
+HID_DIM = 256
 N_LAYERS = 2
 ENC_DROPOUT = 0.5
 DEC_DROPOUT = 0.5
@@ -49,8 +49,8 @@ transformer = TransformerDecoder(
           idx_to_word = train_dataset.reverse_vocab,
           input_dim=ENC_EMB_DIM,
           embed_dim=HID_DIM,
-          num_heads=4,
-          num_layers=6,
+          num_heads=2,
+          num_layers=2,
           max_length=30,
           device = device
         )

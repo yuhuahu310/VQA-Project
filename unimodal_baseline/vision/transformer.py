@@ -10,26 +10,41 @@ EOS_TOKEN = "<eos>"
 PAD_TOKEN = "<pad>"
 OOV_TOKEN = "<oov>"
 
+# class PositionalEncoding(nn.Module):
+
+#     def __init__(self, d_model: int, dropout: float = 0.1, max_len: int = 5000):
+#         super().__init__()
+#         self.dropout = nn.Dropout(p=dropout)
+
+#         position = torch.arange(max_len).unsqueeze(1)
+#         div_term = torch.exp(torch.arange(0, d_model, 2) * (-math.log(10000.0) / d_model))
+#         pe = torch.zeros(max_len, 1, d_model)
+#         pe[:, 0, 0::2] = torch.sin(position * div_term)
+#         pe[:, 0, 1::2] = torch.cos(position * div_term)
+#         self.register_buffer('pe', pe)
+
+#     def forward(self, x):
+#         """
+#         Args:
+#             x: Tensor, shape [seq_len, batch_size, embedding_dim]
+#         """
+#         x = x + self.pe[:x.size(0)]
+#         return self.dropout(x)
 class PositionalEncoding(nn.Module):
-
-    def __init__(self, d_model: int, dropout: float = 0.1, max_len: int = 5000):
+    def __init__(self, embed_dim, dropout=0.1, max_len=5000):
         super().__init__()
-        self.dropout = nn.Dropout(p=dropout)
-
-        position = torch.arange(max_len).unsqueeze(1)
-        div_term = torch.exp(torch.arange(0, d_model, 2) * (-math.log(10000.0) / d_model))
-        pe = torch.zeros(max_len, 1, d_model)
-        pe[:, 0, 0::2] = torch.sin(position * div_term)
-        pe[:, 0, 1::2] = torch.cos(position * div_term)
-        self.register_buffer('pe', pe)
-
+        # TODO - use torch.nn.Embedding to create the encoding. Initialize dropout layer.
+        self.encoding = nn.Embedding(max_len, embed_dim)
+        self.dropout = nn.Dropout(dropout)
+      
     def forward(self, x):
-        """
-        Args:
-            x: Tensor, shape [seq_len, batch_size, embedding_dim]
-        """
-        x = x + self.pe[:x.size(0)]
-        return self.dropout(x)
+        N, S, D = x.shape
+        # TODO - add the encoding to x
+
+        output = x + self.encoding(torch.arange(S, device=x.device, dtype=torch.int)).unsqueeze(0).expand(N, -1, -1)
+        output = self.dropout(output)
+   
+        return output
 
 class TransformerDecoder(nn.Module):
     def __init__(self, word_to_idx, idx_to_word, input_dim, embed_dim, num_heads=4,
@@ -48,6 +63,7 @@ class TransformerDecoder(nn.Module):
         super().__init__()
 
         vocab_size = len(word_to_idx)
+        print("vocab_size: ", vocab_size)
         self._null = word_to_idx[PAD_TOKEN]
         self._start = word_to_idx.get(SOS_TOKEN, None)
         self.idx_to_word = idx_to_word
@@ -73,7 +89,7 @@ class TransformerDecoder(nn.Module):
         # captions = torch.cat([question, answer],1)
         caption_embedding = self.caption_embedding(captions)
         caption_embedding = self.positional_encoding(caption_embedding)
-        feature_embedding = self.feature_embedding(features)
+        feature_embedding = self.feature_embedding(features.float())
 
         # Unsqueeze feature embedding along dimension 1
         # expected feature embedding output shape : (N, 1, D) 
@@ -105,7 +121,7 @@ class TransformerDecoder(nn.Module):
         
         output = captions_embed
         for layer in self.layers:
-            output = layer(output, features_embed, mask=mask)
+            output = layer(output, features_embed, tgt_mask=mask)
 
         scores = self.score_projection(output)
         return scores

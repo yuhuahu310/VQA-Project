@@ -6,6 +6,7 @@ from skimage.transform import resize
 from nltk.tokenize import RegexpTokenizer
 import numpy as np
 from vqa import VQA
+from torch.nn import functional as F
 
 SOS_TOKEN = "<sos>"
 EOS_TOKEN = "<eos>"
@@ -27,6 +28,7 @@ class VQADataset(Dataset):
         else:
             self.vocab = np.concatenate(([SOS_TOKEN, EOS_TOKEN, PAD_TOKEN, OOV_TOKEN], VQA(annotation_file=os.path.join(ds_path, 'Annotations/train.json')).get_vocab()))
         # import pdb;pdb.set_trace()
+        self.vocab_size = len(self.vocab)
         self.reverse_vocab = dict(list(enumerate(self.vocab)))
         self.vocab = dict(zip(self.vocab, np.arange(len(self.vocab))))
         self.ds_path = ds_path
@@ -105,8 +107,8 @@ def collate_fn_pad(batch):
 
 
 def collate_fn_pad_image(batch):
-    questions = torch.nn.utils.rnn.pad_sequence([t[1] for t in batch], padding_value=2)
-    answers = torch.nn.utils.rnn.pad_sequence([t[2] for t in batch], padding_value=2)
+    questions = torch.nn.utils.rnn.pad_sequence([t[1] for t in batch], padding_value=2, batch_first=True)
+    answers = torch.nn.utils.rnn.pad_sequence([t[2] for t in batch], padding_value=2, batch_first=True)
     img_list = [t[0] for t in batch]
     images = torch.stack(img_list, dim=0)
     return images, questions, answers
