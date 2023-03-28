@@ -55,19 +55,26 @@ class VQADataset(Dataset):
         question = qa_pair['question']
 
         # Get image and convert to tensor
-        img_fpath = os.path.join(self.ds_path, "Images", self.phase, image_id)
+        img_fpath = os.path.join(self.ds_path, self.phase, image_id)
         img_arr = io.imread(img_fpath)
-        img_arr = resize(img_arr, (800, 600))
+        img_arr = resize(img_arr, (224, 224))
         img_tensor = torch.tensor(img_arr)
+        img_tensor = torch.permute(img_tensor, (2, 0, 1))
 
-        # TODO: Convert answers and questions to one-hot vectors
-        # answer_vocab = self.vqa.get_answers_vocab()
-        # answer_vec = torch.zeros(len(answer_vocab))
-        # for ans in answers:
-        #     ans_idx = answer_vocab[ans['answer']]
-        #     answer_vec[ans_idx] = 1
-        return img_tensor
-    
+        # Convert answers and questions to index sequence
+        qa_pair = self.vqa.dataset[idx]
+        answers = qa_pair['answers']
+        question = qa_pair['question']
+        flat_answers = [i['answer'] for i in answers]
+        # In case of a tie, pick the first. Might consider pick randomly
+        answer = max(flat_answers, key=flat_answers.count)
+
+        q_vec = self._sent_2_idx_seq(question)
+        a_vec = self._sent_2_idx_seq(answer)
+        return torch.tensor(q_vec, dtype=torch.int), torch.tensor(a_vec, dtype=torch.int), img_tensor
+
+
+
 class QADataset(VQADataset):
     def __init__(self, ds_path, phase, tokenize=True):
         super().__init__(ds_path, phase)
@@ -95,6 +102,15 @@ def collate_fn_pad(batch):
     questions = torch.nn.utils.rnn.pad_sequence([t[0] for t in batch], padding_value=2)
     answers = torch.nn.utils.rnn.pad_sequence([t[1] for t in batch], padding_value=2)
     return questions, answers
+
+
+def collate_fn_pad_image(batch):
+    questions = torch.nn.utils.rnn.pad_sequence([t[0] for t in batch], padding_value=2)
+    answers = torch.nn.utils.rnn.pad_sequence([t[1] for t in batch], padding_value=2)
+    img_list = [t[2] for t in batch]
+    images = torch.stack(img_list, dim=0)
+    return questions, answers, images
+
 
 if __name__ == '__main__':
     vqa_dataset = VQADataset("../data", "train")
