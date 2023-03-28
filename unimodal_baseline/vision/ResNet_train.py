@@ -7,6 +7,7 @@ from torch.utils.data import DataLoader
 import torch.nn as nn
 import torch.optim as optim
 import torch
+import torchvision
 
 
 # Set device to GPU if available, otherwise use CPU
@@ -63,10 +64,11 @@ if __name__ == "__main__":
     BATCH_SIZE = 64
     NUM_EPOCH = 100
 
-    # resnet = ResNet18(256)
-    resnet = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18', pretrained=True)
+    # encoder = ResNet18(256)
+    # encoder = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18', pretrained=True)
+    encoder = torchvision.models.vit_b_16(weights='DEFAULT')
 
-    optimizer = optim.Adam(resnet.parameters())
+    optimizer = optim.Adam(encoder.parameters())
     TRG_PAD_IDX = 2
     criterion = nn.CrossEntropyLoss(ignore_index=TRG_PAD_IDX)
 
@@ -74,7 +76,7 @@ if __name__ == "__main__":
     val_loader = DataLoader(ds_val, batch_size=BATCH_SIZE, shuffle=False, collate_fn=collate_fn_pad_image)
 
     for epoch in range(NUM_EPOCH):
-        train_loss = train(resnet, train_loader, optimizer, criterion, ds_train)
+        train_loss = train(encoder, train_loader, optimizer, criterion, ds_train)
         break
         # val_loss = eval(model, val_loader, criterion, qa_dataset_val)
         # print('Epoch [{}/{}], Average Training Loss: {:.4f}'.format(epoch + 1, NUM_EPOCH, train_loss))
