@@ -63,7 +63,9 @@ if __name__ == "__main__":
     BATCH_SIZE = 64
     NUM_EPOCH = 100
 
-    resnet = ResNet18(256)
+    # resnet = ResNet18(256)
+    resnet = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18', pretrained=True)
+
     optimizer = optim.Adam(resnet.parameters())
     TRG_PAD_IDX = 2
     criterion = nn.CrossEntropyLoss(ignore_index=TRG_PAD_IDX)
