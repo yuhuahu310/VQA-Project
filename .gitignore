@@ -469,3 +469,5 @@ pyrightconfig.json
 data/.idea/
 Images/
 data/
+unimodal_baseline/language/outputs/
+unimodal_baseline/language/lightning_logs/

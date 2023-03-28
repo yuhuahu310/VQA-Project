@@ -43,7 +43,7 @@ Batch [100/321], Loss: 0.5342
 Train Batch [100/321]
 [Question]: What is the expiry date on this cream
         [Answer]: unanswerable 15 then rinse
-        [Target]: unanswerable
+        [Target]: unanswerable <eos> <pad> <pad>
 [Question]: Can you tell me what s in front of me
         [Answer]: grass
         [Target]: grass

@@ -69,8 +69,9 @@ class VQADataset(Dataset):
         return img_tensor
     
 class QADataset(VQADataset):
-    def __init__(self, ds_path, phase):
+    def __init__(self, ds_path, phase, tokenize=True):
         super().__init__(ds_path, phase)
+        self.tokenize = tokenize
 
     def __getitem__(self, idx):
         '''Return only questions and all answers as idx seqs
@@ -78,11 +79,14 @@ class QADataset(VQADataset):
         qa_pair = self.vqa.dataset[idx]
         answers = qa_pair['answers']
         question = qa_pair['question']
-        q_vec = self._sent_2_idx_seq(question)
-
         flat_answers = [i['answer'] for i in answers]
         # In case of a tie, pick the first. Might consider pick randomly
         answer = max(flat_answers, key=flat_answers.count) 
+
+        if not self.tokenize:
+            return question, answer
+        
+        q_vec = self._sent_2_idx_seq(question)
         a_vec = self._sent_2_idx_seq(answer)
         return torch.tensor(q_vec, dtype=torch.int), torch.tensor(a_vec, dtype=torch.int)
 

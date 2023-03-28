@@ -1,0 +1,188 @@
+loading dataset into memory...
+0:00:00.252443
+loading dataset into memory...
+0:00:00.033489
+loading dataset into memory...
+0:00:00.158608
+Train samples:
+[Question]: What is in this bottle?
+	[Answer]: unanswerable
+	[Target]: unanswerable
+[Question]: What is this?
+	[Answer]: unanswerable
+	[Target]: teddy bear
+[Question]: What color are my pants?
+	[Answer]: grey
+	[Target]: red
+[Question]: What is this?
+	[Answer]: unanswerable
+	[Target]: wine
+[Question]: What does this say?
+	[Answer]: unanswerable
+	[Target]: hit mother lode
+[Question]: How much is this? 
+	[Answer]: 1 dollar
+	[Target]: unanswerable
+[Question]: Hi, can you tell me what's in the box in the picture and what the cooking instructions are? Thank you.
+	[Answer]: unanswerable
+	[Target]: unanswerable
+[Question]: Are these regular chips or salt and vinegar chips? Thank you.
+	[Answer]: salt vinegar
+	[Target]: alt vinegar
+[Question]: What does the sky look like in this photograph?
+	[Answer]: cloudy
+	[Target]: cloudy
+[Question]: Can you tell me what kind of coffee this is? I know its a Keurig brand but I need to know what flavor. Thank you.
+	[Answer]: unanswerable
+	[Target]: cinnamon roll
+[Question]: What is this bottle?
+	[Answer]: unanswerable
+	[Target]: coca cola
+[Question]: Is this the io cable remote?
+	[Answer]: yes
+	[Target]: ye
+[Question]: What color is it?
+	[Answer]: white
+	[Target]: grey
+[Question]: What color is it?
+	[Answer]: white
+	[Target]: black
+[Question]: What color and any designs?
+	[Answer]: black
+	[Target]: white
+[Question]: Can you tell me the name of this package or read the cooking instructions?
+	[Answer]: no
+	[Target]: no
+[Question]: What flavor dog food is that please?
+	[Answer]: unanswerable
+	[Target]: unanswerable
+[Question]: What does this phone bill show?
+	[Answer]: 1 dollar
+	[Target]: unanswerable
+[Question]: What is in this can please?
+	[Answer]: unanswerable
+	[Target]: beef broth
+[Question]: I need to know if this washing machine is set on its normal cycle or some other cycle, like permanent press.
+	[Answer]: on normal
+	[Target]: unanswerable
+[Question]: What color is this trash can?
+	[Answer]: white
+	[Target]: black
+[Question]: Can you please tell me what type of cheese that is?
+	[Answer]: feta
+	[Target]: unanswerable
+[Question]: what color is that, please?
+	[Answer]: grey
+	[Target]: unanswerable
+[Question]: What is this bottle please?
+	[Answer]: lotion
+	[Target]: unanswerable
+[Question]: What is it?
+	[Answer]: unanswerable
+	[Target]: keyboard
+[Question]: Could you please tell me what is in this package?
+	[Answer]: unanswerable
+	[Target]: unanswerable
+[Question]: What color is my jacket?
+	[Answer]: grey
+	[Target]: blue
+[Question]: What is the manufacture and model number of this device?
+	[Answer]: unanswerable
+	[Target]: unanswerable
+[Question]: Color is this bag?
+	[Answer]: grey
+	[Target]: black
+[Question]: What is in this jar?
+	[Answer]: unanswerable
+	[Target]: unanswerable
+Val samples:
+[Question]: Can contents, please.
+	[Answer]: unanswerable
+	[Target]: hominy
+[Question]: Can you tell me what kind of Keurig flavor coffee this is? I know it's Keurig, what flavor please. Thank you
+	[Answer]: unanswerable
+	[Target]: dark chocolate
+[Question]: What color is this please?
+	[Answer]: grey
+	[Target]: red
+[Question]: Who is answering my question?
+	[Answer]: unanswerable
+	[Target]: unanswerable
+[Question]: Whats in this can?
+	[Answer]: unanswerable
+	[Target]: kidney bean
+[Question]: what kind of soda is this?
+	[Answer]: pepsi
+	[Target]: orange fanta
+[Question]: Hello could you please tell me what this says? Thank you.
+	[Answer]: unanswerable
+	[Target]: unanswerable
+[Question]: What animal is on this computer screen?
+	[Answer]: unanswerable
+	[Target]: 0
+[Question]: What does the screen say?
+	[Answer]: unanswerable
+	[Target]: unanswerable
+[Question]: What kind of TV dinner is this?
+	[Answer]: unanswerable
+	[Target]: tuna noodle casserole
+[Question]: What flavor is this?
+	[Answer]: unanswerable
+	[Target]: awake
+[Question]: Can you tell by looking at this, at the label, what it is, I think it's a piece, a dvd in the mail.
+	[Answer]: unanswerable
+	[Target]: ye
+[Question]: What is this?
+	[Answer]: unanswerable
+	[Target]: unanswerable
+[Question]: What is this box?
+	[Answer]: unanswerable
+	[Target]: paghetti meat sauce
+[Question]: What is this?
+	[Answer]: unanswerable
+	[Target]: minecraft screen
+[Question]: What is the product that's on the counter?
+	[Answer]: unanswerable
+	[Target]: unanswerable
+[Question]: What kind of soup is this?  Thank you.
+	[Answer]: unanswerable
+	[Target]: unanswerable
+[Question]: what color is this?
+	[Answer]: grey
+	[Target]: pink
+[Question]: What is this?
+	[Answer]: unanswerable
+	[Target]: bulletin board
+[Question]: What's on the back of that card?
+	[Answer]: unanswerable
+	[Target]: unanswerable
+[Question]: What is shown in the little rectangular window?
+	[Answer]: unanswerable
+	[Target]: unanswerable
+[Question]: Looking what I get after the recording screen.
+	[Answer]: unanswerable
+	[Target]: unanswerable
+[Question]: What's this?
+	[Answer]: unanswerable
+	[Target]: fridge
+[Question]: Is Windows all the way up, or is something loading?
+	[Answer]: full
+	[Target]: omething loading
+[Question]: What is in this can, please?
+	[Answer]: unanswerable
+	[Target]: unanswerable
+[Question]: What does this say?
+	[Answer]: unanswerable
+	[Target]: unanswerable
+[Question]: What flavor is this?
+	[Answer]: unanswerable
+	[Target]: green tea
+[Question]: Please tell me what this says. Please tell me what this says.
+	[Answer]: unanswerable
+	[Target]: unanswerable
+[Question]: What product is this please, and thank you?
+	[Answer]: unanswerable
+	[Target]: unanswerable
+[Question]: Is there any numbers on this paper? And if so, please tell me what they are.
+	[Answer]: no
+	[Target]: unanswerable
