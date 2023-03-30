@@ -2,11 +2,14 @@ import numpy as np
 import torch.nn.functional as F
 
 import torch
+import torchvision.models as models
+from torch.profiler import profile, record_function, ProfilerActivity
+import torch
 
 
 class Trainer(object):
 
-    def __init__(self, model, train_dataloader, val_dataloader, learning_rate = 0.001, num_epochs = 10, print_every = 10, verbose = True, device = 'cuda'):
+    def __init__(self, model, train_dataloader, val_dataloader, learning_rate = 0.001, num_epochs = 10, print_every = 5, verbose = True, device = 'cuda'):
       
         self.model = model
         self.train_dataloader = train_dataloader
@@ -42,6 +45,7 @@ class Trainer(object):
 
         self.model.train()
         return val_loss/num_batches
+    
 
     def train(self):
         """
@@ -50,11 +54,20 @@ class Trainer(object):
         for i in range(self.num_epochs):
             epoch_loss = 0
             num_batches = 0
-            i = 0
+            b = 0
             for batch in self.train_dataloader:
-                print("batch i: ", i)
-                i += 1
                 features, questions, answers = batch[0].to(self.device), batch[1].to(self.device), batch[2].to(self.device)
+
+                # with profile(activities=[
+                #         ProfilerActivity.CPU, ProfilerActivity.CUDA], record_shapes=True) as prof:
+                #     with record_function("model_inference"):
+                #         logits = self.model(features, answers[:, :-1])
+
+                # print(prof.key_averages().table(sort_by="cuda_time_total", row_limit=10))
+
+                # def count_parameters(model):
+                #     return sum(p.numel() for p in model.parameters() if p.requires_grad)
+                # print("model parameters: ", count_parameters(self.model))
                 logits = self.model(features, answers[:, :-1])
 
                 loss = self.loss(logits, answers[:, 1:])
@@ -69,3 +82,6 @@ class Trainer(object):
             if self.verbose and (i +1) % self.print_every == 0:
                 self.val_loss_history.append(self.val())
                 print( "(epoch %d / %d) loss: %f" % (i+1 , self.num_epochs, self.loss_history[-1]))    
+            
+            if (i +1) % self.print_every == 0:
+                torch.save(self.model.state_dict(), "/home/yizhi/VQA-Project/unimodal_baseline/vision/model_%d.pth" % i)

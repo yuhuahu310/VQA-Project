@@ -74,6 +74,8 @@ class TransformerDecoder(nn.Module):
         self.caption_embedding = nn.Embedding(vocab_size, embed_dim, padding_idx=self._null)
         self.positional_encoding = PositionalEncoding(embed_dim, max_len=max_length)
         self.resnet = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18', pretrained=True)
+        # for param in self.resnet.parameters():
+        #     param.requires_grad = False
         self.feature_embedding = nn.Sequential(
             self.resnet,
             nn.Linear(input_dim, embed_dim)
@@ -96,12 +98,9 @@ class TransformerDecoder(nn.Module):
         feature_embedding = torch.unsqueeze(feature_embedding, 1)
         return feature_embedding, caption_embedding
 
-    def get_causal_mask(self, _len):
-        #TODO - get causal mask. This should be a matrix of shape (_len, _len). 
-        # This mask is multiplicative
-        # setting mask[i,j] = 0 means jth element of the sequence is not used 
-        # to predict the ith element of the sequence.
-        mask = torch.triu(torch.ones(_len, _len, device=self.device)).transpose(0,1)
+    def generate_square_subsequent_mask(self, seq_size): 
+        mask = (torch.triu(torch.ones(seq_size, seq_size, device=self.device)) == 1).transpose(0, 1)
+        mask = mask.masked_fill(mask == 0, 1).masked_fill(mask == 1, 0)
         return mask
                                       
     def forward(self, features, captions):
@@ -116,7 +115,7 @@ class TransformerDecoder(nn.Module):
          - scores: score for each token at each timestep, of shape (N, T, V)
         """
         features_embed, captions_embed = self.get_data_embeddings(features, captions)
-        mask = self.get_causal_mask(captions_embed.shape[1])
+        mask = self.generate_square_subsequent_mask(captions_embed.shape[1])
         mask.to(captions_embed.dtype)
         
         output = captions_embed

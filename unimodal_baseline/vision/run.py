@@ -37,11 +37,12 @@ HID_DIM = 256
 N_LAYERS = 2
 ENC_DROPOUT = 0.5
 DEC_DROPOUT = 0.5
-BATCH_SIZE = 64
+BATCH_SIZE = 512
 NUM_EPOCH = 100
 
-train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, collate_fn=collate_fn_pad_image)
-val_dataloader = DataLoader(qa_dataset_val, batch_size=BATCH_SIZE, shuffle=False, collate_fn=collate_fn_pad_image)
+
+train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, collate_fn=collate_fn_pad_image, num_workers=64)
+val_dataloader = DataLoader(qa_dataset_val, batch_size=BATCH_SIZE, shuffle=False, collate_fn=collate_fn_pad_image, num_workers=64)
 
 device = 'cuda'
 transformer = TransformerDecoder(
@@ -49,8 +50,8 @@ transformer = TransformerDecoder(
           idx_to_word = train_dataset.reverse_vocab,
           input_dim=ENC_EMB_DIM,
           embed_dim=HID_DIM,
-          num_heads=2,
-          num_layers=2,
+          num_heads=4,
+          num_layers=6,
           max_length=30,
           device = device
         )
@@ -62,6 +63,12 @@ trainer = Trainer(transformer, train_dataloader, val_dataloader,
         )
 
 trainer.train()
+
+# torch.save(transformer.state_dict(), "/home/yizhi/VQA-Project/unimodal_baseline/vision/model.pth")
+
+# transformer.load_state_dict(torch.load("/home/yizhi/VQA-Project/unimodal_baseline/vision/model_99.pth"))
+# transformer.eval()
+
 
 # Plot the training losses.
 plt.plot(trainer.loss_history)
@@ -92,22 +99,21 @@ def decode_captions(captions, idx_to_word):
     return decoded
 
 def vis_imgs(split):
-    data = {'train': train_dataset.data, 'val': val_dataset.data}[split]
+    # data = {'train': train_dataset.data, 'val': val_dataset.data}[split]
     loader = {'train': train_dataloader, 'val': val_dataloader}[split]
     num_imgs = 0 
     for batch in loader:
-      import pdb; pdb.set_trace()
-      features, gt_captions, idxs = batch
-      urls = data["%s_urls" % split][idxs]
+      features, questions, answers = batch
       
-      gt_captions = decode_captions(gt_captions, transformer.idx_to_word)
-      sample_captions = transformer.sample(features, max_length=30)
-      sample_captions = decode_captions(sample_captions, transformer.idx_to_word)
+      gt_captions = decode_captions(answers.numpy(), train_dataset.reverse_vocab)
+      sample_captions = transformer.sample(features.float(), max_length=30)
+      sample_captions = decode_captions(sample_captions, train_dataset.reverse_vocab)
       
-      for gt_caption, sample_caption, url in zip(gt_captions, sample_captions, urls):
-          img = image_from_url(url)
+      for gt_caption, sample_caption, img in zip(gt_captions, sample_captions, features):
           # Skip missing URLs.
           if img is not None: 
+            img = img.swapaxes(0, 1)
+            img = img.swapaxes(1, 2)
             plt.imshow(img)            
             plt.title('%s\n%s\nGT:%s' % (split, sample_caption, gt_caption))
             plt.axis('off')

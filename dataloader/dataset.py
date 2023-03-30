@@ -4,6 +4,7 @@ import os
 import skimage.io as io
 from skimage.transform import resize
 from nltk.tokenize import RegexpTokenizer
+from torchvision import transforms
 import numpy as np
 from vqa import VQA
 from torch.nn import functional as F
@@ -62,6 +63,7 @@ class VQADataset(Dataset):
         img_arr = resize(img_arr, (224, 224))
         img_tensor = torch.tensor(img_arr)
         img_tensor = torch.permute(img_tensor, (2, 0, 1))
+        img_tensor = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])(img_tensor)
 
         # Convert answers and questions to index sequence
         qa_pair = self.vqa.dataset[idx]
