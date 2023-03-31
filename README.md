@@ -52,5 +52,37 @@ PEP 8 naming conventions should be followed. In particular,
 
 PyPi packages required should be added to `requirements.txt`. They can be installed using `pip install -r requirements.txt`.
 
+## VQA Sample Viewer
+
+Run `python -m http.server` at project root. Go to [http://localhost:8000/viewer](http://localhost:8000/viewer).
+
+Enter a relative path (relative to `viewer/`) into `JSON File Path` of a json file of the format (for example):
+
+```
+{
+    "model_name": "<model_name>",
+    "metadata": {
+        "<custom_key_1>": "<custom_value_1>",
+        "<custom_key_2>": "<custom_value_2>"
+    },
+    "data": [
+        {
+            "image_id": "VizWiz_val_00002767",
+            "question": "what wash cycle do i have this on",
+            "predicted_answer": "rinse",
+            "target_answer": "rinse"
+        },
+        {
+            "image_id": "VizWiz_val_00001778",
+            "question": "what is it",
+            "predicted_answer": "snow",
+            "target_answer": "snow"
+        }
+    ]
+}
+```
+
+Enter into `Image Data Path` the relative path to images. For example, `../data/Images/val/`. Then you can visualize the VQA output as specified by the JSON file. Use left and right arrow to navigate.
+
 ## Authors
 ~~Video~~ Visual QA Ninjas @ CMU 11-777 MMML
