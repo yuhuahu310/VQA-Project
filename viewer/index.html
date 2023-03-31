@@ -31,25 +31,43 @@
         .field-name {
             font-weight: bold;
         }
+
+        .input-group-container {
+            display: flex;
+        }
+
+        .input-group-wrapper {
+            flex-grow: 1;
+        }
+
+        #jsonPathSubmitButton {
+            flex-basis: auto;
+            margin-left: 10px;
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
         <h2 class="text-center">VQA Sample Viewer</h2>
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <span class="input-group-text">JSON File Path</span>
+        <div class="input-group-container">
+            <div class="input-group-wrapper">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">JSON File Path</span>
+                    </div>
+                    <input type="text" id="jsonPathInput" class="form-control" placeholder="Enter JSON file path">
+                </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Image Data Path</span>
+                    </div>
+                    <input type="text" id="dataPathInput" class="form-control" value="../data/Images/val/"
+                        placeholder="Enter image data path">
+                </div>
             </div>
-            <input type="text" id="jsonPathInput" class="form-control" placeholder="Enter JSON file path">
+            <button id="jsonPathSubmitButton" class="btn btn-primary mb-3 align-self-stretch">Load JSON</button>
         </div>
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Image Data Path</span>
-            </div>
-            <input type="text" id="dataPathInput" class="form-control" placeholder="Enter image data path">
-        </div>
-        <button id="jsonPathSubmitButton" class="btn btn-primary mb-3">Load JSON</button>
         <div class="card mb-3">
             <div class="card-body">
                 <span class="field-name">Model Name:</span> <span id="modelName"></span><br>
@@ -67,6 +85,8 @@
         </div>
         <div class="navigation">
             <button id="leftArrowButton" class="btn btn-secondary">&#8592;</button>
+            <input type="number" id="currentIndexInput" class="form-control" style="width: 80px; display: inline;">
+            <span id="totalItems"></span>
             <button id="rightArrowButton" class="btn btn-secondary">&#8594;</button>
         </div>
     </div>
@@ -75,7 +95,6 @@
         let jsonData = null;
         let currentDataIndex = 0;
         let dataPath = '';
-
         document.getElementById('jsonPathSubmitButton').addEventListener('click', () => {
             const jsonPath = document.getElementById('jsonPathInput').value;
             dataPath = document.getElementById('dataPathInput').value;
@@ -83,7 +102,10 @@
                 .then(response => response.json())
                 .then(data => {
                     jsonData = data;
+                    // Sort the data items by the "image_id" field in ascending order
+                    jsonData.data.sort((a, b) => a.image_id.localeCompare(b.image_id));
                     currentDataIndex = 0;
+                    document.getElementById('totalItems').textContent = '/' + jsonData.data.length;
                     displayData();
                 })
                 .catch(error => {
@@ -97,6 +119,7 @@
                 displayData();
             }
         });
+
         document.getElementById('rightArrowButton').addEventListener('click', () => {
             if (jsonData && currentDataIndex < jsonData.data.length - 1) {
                 currentDataIndex++;
@@ -104,16 +127,27 @@
             }
         });
 
+        document.getElementById('currentIndexInput').addEventListener('change', () => {
+            const newIndex = parseInt(document.getElementById('currentIndexInput').value) - 1;
+            if (jsonData && newIndex >= 0 && newIndex < jsonData.data.length) {
+                currentDataIndex = newIndex;
+                displayData();
+            } else {
+                alert('Index out of bounds!');
+            }
+        });
+
         function displayData() {
             if (!jsonData) return;
             const dataItem = jsonData.data[currentDataIndex];
-            document.getElementById('imageDisplay').src = dataPath + '/' + dataItem.image_id + '.jpg';
+            document.getElementById('imageDisplay').src = dataPath + dataItem.image_id + '.jpg';
             document.getElementById('imageId').textContent = dataItem.image_id;
             document.getElementById('question').textContent = dataItem.question;
             document.getElementById('predictedAnswer').textContent = dataItem.predicted_answer;
             document.getElementById('targetAnswer').textContent = dataItem.target_answer;
             document.getElementById('modelName').textContent = jsonData.model_name;
             document.getElementById('metadata').textContent = JSON.stringify(jsonData.metadata, null, 2);
+            document.getElementById('currentIndexInput').value = currentDataIndex + 1;
         }
     </script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
