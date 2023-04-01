@@ -80,9 +80,10 @@ class VQADataset(Dataset):
 
 
 class QADataset(VQADataset):
-    def __init__(self, ds_path, phase, tokenize=True):
+    def __init__(self, ds_path, phase, tokenize=True, include_imageid=False):
         super().__init__(ds_path, phase)
         self.tokenize = tokenize
+        self.include_imageid = include_imageid
 
     def __getitem__(self, idx):
         '''Return only questions and all answers as idx seqs
@@ -95,11 +96,17 @@ class QADataset(VQADataset):
         answer = max(flat_answers, key=flat_answers.count) 
 
         if not self.tokenize:
-            return question, answer
+            if self.include_imageid:
+                return question, answer, qa_pair['image']
+            else:
+                return question, answer
         
         q_vec = self._sent_2_idx_seq(question)
         a_vec = self._sent_2_idx_seq(answer)
-        return torch.tensor(q_vec, dtype=torch.int), torch.tensor(a_vec, dtype=torch.int)
+        if self.include_imageid:
+            return torch.tensor(q_vec, dtype=torch.int), torch.tensor(a_vec, dtype=torch.int), qa_pair['image']
+        else:
+            return torch.tensor(q_vec, dtype=torch.int), torch.tensor(a_vec, dtype=torch.int)
 
 
 def collate_fn_pad(batch):

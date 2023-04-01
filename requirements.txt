@@ -2,8 +2,10 @@ nltk
 numpy
 pandas
 torch
+torchvision
 seaborn
 matplotlib
 scikit-image
 simplet5
 transformers
+chardet
