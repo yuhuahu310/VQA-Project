@@ -112,7 +112,8 @@ class QADataset(VQADataset):
 def collate_fn_pad(batch):
     questions = torch.nn.utils.rnn.pad_sequence([t[0] for t in batch], padding_value=2)
     answers = torch.nn.utils.rnn.pad_sequence([t[1] for t in batch], padding_value=2)
-    return questions, answers
+    image_ids = [t[2] for t in batch]
+    return questions, answers, image_ids
 
 
 def collate_fn_pad_image(batch):

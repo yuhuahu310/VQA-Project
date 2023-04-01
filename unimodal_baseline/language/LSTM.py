@@ -6,6 +6,8 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, Dataset
 import random
+import os
+import json
 
 
 # Set device to GPU if available, otherwise use CPU
@@ -97,24 +99,32 @@ def build_LSTM(encoder_emb_dim, decoder_emb_dim, hidden_dim, vocab_size, n_layer
 
     return model, optimizer, criterion
 
-def print_qa_example(questions, answers, outputs, dataset, batch_idx, len_dataloader, mode):
+def print_qa_example(questions, answers, outputs, dataset, batch_idx, len_dataloader, mode, prnt=True, num_samples=10):
     curr_bs = questions.shape[1]
-    num_samples = 10
+    if num_samples == None:
+        num_samples = curr_bs
     if curr_bs >= num_samples:
         sample_questions = questions[:, :num_samples].T
         sample_targets = answers[:, :num_samples].T
         sample_outputs = outputs[:, :num_samples, :].transpose(0, 1).argmax(dim=-1)
-        print(f'{mode} Batch [{batch_idx + 1}/{len_dataloader}]')
+        all_questions = []
+        all_targets = []
+        all_predictions = []
+        if prnt: print(f'{mode} Batch [{batch_idx + 1}/{len_dataloader}]')
         for i in range(num_samples):
             q = dataset.idx_seq_2_sent(sample_questions[i].cpu().numpy())
             a = dataset.idx_seq_2_sent(sample_outputs[i].cpu().numpy())
             tg = dataset.idx_seq_2_sent(sample_targets[i].cpu().numpy())
-            print('[Question]: {}\n\t[Answer]: {}\n\t[Target]: {}'.format(q, a, tg))
+            if prnt: print('[Question]: {}\n\t[Answer]: {}\n\t[Target]: {}'.format(q, a, tg))
+            all_questions.append(q)
+            all_targets.append(tg)
+            all_predictions.append(a)
+        return all_questions, all_targets, all_predictions
 
 def train(model, dataloader, optimizer, criterion, dataset):
     total_loss = 0
     model.train()
-    for batch_idx, (questions, answers) in enumerate(dataloader):
+    for batch_idx, (questions, answers, _) in enumerate(dataloader):
         # Move data to GPU if available
         questions = questions.to(device)
         answers = answers.to(device)
@@ -150,11 +160,16 @@ def train(model, dataloader, optimizer, criterion, dataset):
     return total_loss / len(dataloader)
 
 
-def eval(model, dataloader, criterion, dataset):
+def eval(model, dataloader, criterion, dataset, mode='val', dump=''):
     model.eval()
     total_loss = 0
+
+    all_image_ids = []
+    all_questions = []
+    all_targets = []
+    all_predictions = []
     with torch.no_grad():
-        for batch_idx, (questions, answers) in enumerate(dataloader):
+        for batch_idx, (questions, answers, image_ids) in enumerate(dataloader):
             # Move data to GPU if available
             questions = questions.to(device)
             answers = answers.to(device)
@@ -170,14 +185,50 @@ def eval(model, dataloader, criterion, dataset):
 
             if (batch_idx+1) % 60 == 0:
                 print_qa_example(questions, answers, outputs, dataset, batch_idx, len(dataloader), 'Eval')
-    
+            
+            batch_qs, batch_ts, batch_ps = print_qa_example(questions, answers, outputs, dataset, batch_idx, len(dataloader), 'Eval',
+                                                            prnt=False, num_samples=None)
+            all_image_ids.extend(image_ids)
+            all_questions.extend(batch_qs)
+            all_targets.extend(batch_ts)
+            all_predictions.extend(batch_ps)
+    if dump:
+        out = {
+            "model_name": "LSTM",
+            "metadata": {
+                "mode": mode,
+                "modality": ["language"]
+            },
+            "data": []
+        }
+        assert len(all_image_ids) == len(all_questions) == len(all_targets) == len(all_predictions)
+        for img, q, tg, pred in zip(all_image_ids, all_questions, all_targets, all_predictions):
+            out["data"].append({
+                "image_id": img.replace(".jpg", ""),
+                "question": q,
+                "predicted_answer": pred,
+                "target_answer": tg
+            })
+
+        with open(dump, 'w') as f:
+            json.dump(out, f, indent=4)
+
     return total_loss / len(dataloader)
 
+def save_model(model, epoch, save_dir, train_loss, val_loss):
+    path = os.path.join(save_dir, f'LSTM-epoch_{epoch}-trainloss_{train_loss:.4f}-valloss_{val_loss:.4f}.pth')
+    torch.save(model.state_dict(), path)
+    print(f"Model saved to {path}")
+
+def load_model(model, file_path):
+    model.load_state_dict(torch.load(file_path))
+    print(f"Model loaded from {file_path}")
+    return model
 
 if __name__ == "__main__":
 
-    qa_dataset_train = QADataset("../../data", "train")
-    qa_dataset_val = QADataset("../../data", "val")
+    qa_dataset_train = QADataset("../../data", "train", include_imageid=True)
+    qa_dataset_val = QADataset("../../data", "val", include_imageid=True)
 
     VOCAB_SIZE = len(qa_dataset_train.vocab)
     ENC_EMB_DIM = 256
@@ -187,16 +238,30 @@ if __name__ == "__main__":
     ENC_DROPOUT = 0.5
     DEC_DROPOUT = 0.5
     BATCH_SIZE = 64
-    NUM_EPOCH = 100
+    NUM_EPOCH = 80
+
+    SAVE_DIR = 'LSTM_ckpt'
+    os.makedirs(SAVE_DIR, exist_ok=True)
+    SAVE_FREQ = 5
 
     model, optimizer, criterion = build_LSTM(ENC_EMB_DIM, DEC_EMB_DIM, HID_DIM, VOCAB_SIZE, N_LAYERS, 
         ENC_DROPOUT, DEC_DROPOUT)
 
     train_loader = DataLoader(qa_dataset_train, batch_size=BATCH_SIZE, shuffle=True, collate_fn=collate_fn_pad)
     val_loader = DataLoader(qa_dataset_val, batch_size=BATCH_SIZE, shuffle=False, collate_fn=collate_fn_pad)
+    
+    TRAIN = False
 
-    for epoch in range(NUM_EPOCH):
-        train_loss = train(model, train_loader, optimizer, criterion, qa_dataset_train)
-        val_loss = eval(model, val_loader, criterion, qa_dataset_val)
-        print('Epoch [{}/{}], Average Training Loss: {:.4f}'.format(epoch + 1, NUM_EPOCH, train_loss))
-        print('Epoch [{}/{}], Average Validation Loss: {:.4f}'.format(epoch + 1, NUM_EPOCH, val_loss))
+    if TRAIN:
+        for epoch in range(NUM_EPOCH):
+            train_loss = train(model, train_loader, optimizer, criterion, qa_dataset_train)
+            val_loss = eval(model, val_loader, criterion, qa_dataset_val)
+            print('Epoch [{}/{}], Average Training Loss: {:.4f}'.format(epoch + 1, NUM_EPOCH, train_loss))
+            print('Epoch [{}/{}], Average Validation Loss: {:.4f}'.format(epoch + 1, NUM_EPOCH, val_loss))
+            if (epoch+1)%SAVE_FREQ == 0:
+                save_model(model, epoch, SAVE_DIR, train_loss, val_loss)
+    else:
+        train_loader = DataLoader(qa_dataset_train, batch_size=BATCH_SIZE, shuffle=False, collate_fn=collate_fn_pad)
+        model = load_model(model, f"{SAVE_DIR}/LSTM-epoch_79-trainloss_1.0620-valloss_5.3343.pth")
+        eval(model, train_loader, criterion, qa_dataset_train, mode='train', dump='LSTM_outputs_train.json')
+        eval(model, val_loader, criterion, qa_dataset_val, mode='val', dump='LSTM_outputs_val.json')
