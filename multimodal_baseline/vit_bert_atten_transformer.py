@@ -158,7 +158,7 @@ class TransformerDecoder(nn.Module):
             partial_caption = torch.LongTensor(partial_caption).to(self.device)
             # [N] -> [N, 1]
             partial_caption = partial_caption.unsqueeze(1)
-            logits = torch.ones((N, max_length, self.new_token_size), device=self.device).float()
+            logits = torch.ones((N, max_length, self.vocab_size), device=self.device).float()
 
             for t in range(max_length):
 
@@ -166,7 +166,6 @@ class TransformerDecoder(nn.Module):
                 output_logits = self.forward(features, questions, partial_caption)
                 output_logits = output_logits[:, -1, :]
                 logits[:, t, :] = output_logits
-
                 # Choose the most likely word ID from the vocabulary.
                 # [N, V] -> [N]
                 word = torch.argmax(output_logits, axis=1)
