@@ -4,7 +4,6 @@ from collections import defaultdict
 def get_accuracy(path):
     '''
     Input: the output json file of model
-    Returns: (accuracy, dict of acc by answer type)
     '''
     with open(path) as f:
         data = json.load(f)
