@@ -59,11 +59,11 @@ class TransformerDecoder(nn.Module):
         self.new_token_size = new_token_size
         self.vocab_size = vocab_size
         
-        decoder_layer = nn.TransformerDecoderLayer(d_model=embed_dim, nhead=num_heads, batch_first=True)
+        decoder_layer = nn.TransformerDecoderLayer(d_model=embed_dim, nhead=num_heads, batch_first=True, dropout=0.3)
         self.layers = nn.ModuleList([decoder_layer for _ in range(num_layers)])
 
-        encoder_layer = nn.TransformerEncoderLayer(d_model=768, nhead=num_heads, batch_first=True)
-        self.encoder = nn.TransformerEncoder(encoder_layer=encoder_layer, num_layers=num_layers).to(device)
+        encoder_layer = nn.TransformerEncoderLayer(d_model=768, nhead=4, batch_first=True, dropout=0.3)
+        self.encoder = nn.TransformerEncoder(encoder_layer=encoder_layer, num_layers=2).to(device)
 
         self.caption_embedding = nn.Embedding(vocab_size, embed_dim, padding_idx=self._null)
         self.positional_encoding = PositionalEncoding(embed_dim, max_len=max_length)
@@ -95,7 +95,7 @@ class TransformerDecoder(nn.Module):
         # freeze language model
         with torch.no_grad():
             questions_embedding = self.bert(questions)[0]
-        
+
         questions_embedding = self.encoder(questions_embedding)
         # only get the CLS embedding of questions
         questions_embedding = questions_embedding[:,0,:]
@@ -158,7 +158,7 @@ class TransformerDecoder(nn.Module):
             partial_caption = torch.LongTensor(partial_caption).to(self.device)
             # [N] -> [N, 1]
             partial_caption = partial_caption.unsqueeze(1)
-            logits = torch.ones((N, max_length, self.new_token_size), device=self.device).float()
+            logits = torch.ones((N, max_length, self.vocab_size), device=self.device).float()
 
             for t in range(max_length):
 
@@ -166,7 +166,6 @@ class TransformerDecoder(nn.Module):
                 output_logits = self.forward(features, questions, partial_caption)
                 output_logits = output_logits[:, -1, :]
                 logits[:, t, :] = output_logits
-
                 # Choose the most likely word ID from the vocabulary.
                 # [N, V] -> [N]
                 word = torch.argmax(output_logits, axis=1)
