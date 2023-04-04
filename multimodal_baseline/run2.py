@@ -131,10 +131,10 @@ def train_and_test(param, value):
                   tokenizer,
                   input_dim=ENC_EMB_DIM,
                   embed_dim=value,
-                  new_token_size = new_token_size,
+                  new_token_size = 0,
                   vocab_size=VOCAB_SIZE,
                   num_heads=4,
-                  num_layers=6,
+                  num_layers=2,
                   max_length=30,
                   device=device
                 )
@@ -142,8 +142,8 @@ def train_and_test(param, value):
         transformer = TransformerDecoder(
                   tokenizer,
                   input_dim=ENC_EMB_DIM,
-                  embed_dim=256,
-                  new_token_size = new_token_size,
+                  embed_dim=128,
+                  new_token_size = 0,
                   vocab_size=VOCAB_SIZE,
                   num_heads=4,
                   num_layers=value,
@@ -187,6 +187,7 @@ def train_and_test(param, value):
     os.makedirs('plots', exist_ok=True)
     plt.title('Val loss history')
     plt.savefig('plots/' + exp_name + '_val_loss_out.png')
+    plt.close()
 
     import torch.nn.functional as F
     def criterion(predictions, labels):
@@ -211,7 +212,8 @@ def train_and_test(param, value):
 # # vis_imgs('train')
 # # vis_imgs('val')
 
-params = {"HID_DIM": [64, 128, 256], "num_layers": [2, 4, 6]}
+# params = {"HID_DIM": [64, 128, 256], "num_layers": [2, 4, 6]}
+params = {"num_layers": [2, 4, 6]}
 for param, values in params.items():
   for value in values:
     train_and_test(param, value)
