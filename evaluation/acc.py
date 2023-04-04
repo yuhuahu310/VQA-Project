@@ -1,5 +1,6 @@
 import json
 from collections import defaultdict
+from common import process_answer
 
 def get_accuracy(path):
     '''
@@ -23,7 +24,7 @@ def get_accuracy(path):
         ann = annotation[d['image_id'] + '.jpg']
         assert d['image_id'] + '.jpg' == ann['image']
         ans_type = ann['answer_type']
-        d['predicted_answer'] = d['predicted_answer'].replace(' <eos>', '') # if eos token exists
+        d['predicted_answer'] = process_answer(d['predicted_answer'])
         count, acc = 0, 0
         for j in range(10):
             count += d['predicted_answer'] == ann['answers'][j]['answer']

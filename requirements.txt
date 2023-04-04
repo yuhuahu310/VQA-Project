@@ -10,3 +10,4 @@ simplet5
 transformers
 chardet
 clip
+torchtext
