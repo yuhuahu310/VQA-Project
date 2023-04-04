@@ -115,7 +115,7 @@ class VQA_mm_Dataset(VQADataset):
         return img_tensor, question, answer, torch.tensor(a_vec, dtype=torch.int), image_id
 
 class VQA_mm2_Dataset(VQADataset):
-    def __init__(self, ds_path, phase, img_transforms=None, tokenizer=None, include_q_vector=False):
+    def __init__(self, ds_path, phase, img_transforms=None, tokenizer=None, include_q_vector=True):
         super().__init__(ds_path, phase)
         self.img_transforms = img_transforms
         self.tokenizer = tokenizer
@@ -212,8 +212,9 @@ def collate_fn_pad_mm2(batch):
     
     # tokenized
     questions = torch.nn.utils.rnn.pad_sequence([t[1] for t in batch], padding_value=0, batch_first=True)
-    answers = torch.nn.utils.rnn.pad_sequence([t[2] for t in batch], padding_value=2, batch_first=True)
-    return images, questions, answers, image_ids
+    answers_vec = torch.nn.utils.rnn.pad_sequence([t[2] for t in batch], padding_value=2, batch_first=True)
+    questions_vec = torch.nn.utils.rnn.pad_sequence([t[4] for t in batch], padding_value=2, batch_first=True)
+    return images, questions, answers_vec, questions_vec, image_ids
 
 
 if __name__ == '__main__':
