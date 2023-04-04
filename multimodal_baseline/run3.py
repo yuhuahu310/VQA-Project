@@ -23,10 +23,10 @@ OOV_TOKEN = "<oov>"
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--hidden', required=True)
-parser.add_argument('--layers', required=True)
-parser.add_argument('--exp', required=True)
-parser.add_argument('--epoch', required=True)
+parser.add_argument('--hidden', type=int, required=True)
+parser.add_argument('--layers', type=int, required=True)
+parser.add_argument('--exp', type=str, required=True)
+parser.add_argument('--epoch', type=int, required=True)
 args = parser.parse_args()
 
 print(f"Hidden Dimension: {args.hidden}")
@@ -52,6 +52,7 @@ ds_path = "../../../../net/projects/ranalab/kh310/vqa"
 
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 print("old_token_size:", len(tokenizer))
+new_token_size = len(tokenizer)
 
 pretrained_vit_weights = torchvision.models.ViT_B_16_Weights.DEFAULT
 train_dataset = VQA_mm2_Dataset(ds_path, "train", img_transforms=pretrained_vit_weights.transforms(), tokenizer=tokenizer)

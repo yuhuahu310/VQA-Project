@@ -75,7 +75,7 @@ class Trainer(object):
                 np.save(f, self.loss_history)
             f.close()
             self.ts_writer.add_scalar('Loss/train', self.loss_history[-1], i)
-            torch.save(self.model.state_dict(), "./model.pth")
+            torch.save(self.model.state_dict(), f"./model_{self.exp_name}.pth")
             if self.verbose and (i +1) % self.print_every == 0:
                 self.val_loss_history.append(self.val())
                 with open(f'{self.exp_name}_val_loss.npy', 'wb') as f:
