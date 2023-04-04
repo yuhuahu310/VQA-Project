@@ -9,3 +9,4 @@ scikit-image
 simplet5
 transformers
 chardet
+clip
