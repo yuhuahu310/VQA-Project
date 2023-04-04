@@ -74,7 +74,7 @@
     <div class="container">
         <h2 class="text-center">VQA Sample Viewer</h2>
         <div class="json-path-inputs">
-            <div class="input-group json-path-input">
+            <!-- <div class="input-group json-path-input">
                 <div class="input-group-prepend">
                     <span class="input-group-text">JSON File Path</span>
                 </div>
@@ -82,14 +82,14 @@
                 <div class="input-group-append">
                     <button class="btn btn-danger remove-json-path" type="button">Remove</button>
                 </div>
-            </div>
+            </div> -->
         </div>
         <button id="addJsonPathButton" class="btn btn-secondary mb-3">Add JSON Path</button>
         <div class="input-group mb-3">
             <div class="input-group-prepend">
                 <span class="input-group-text">Image Data Path</span>
             </div>
-            <input type="text" id="dataPathInput" class="form-control" value="../data/Images/val/"
+            <input type="text" id="dataPathInput" class="form-control" value="../data/Images/train/"
                 placeholder="Enter image data path">
         </div>
         <button id="jsonPathSubmitButton" class="btn btn-primary mb-3">Load JSON</button>
@@ -100,10 +100,13 @@
         <div class="content-wrapper">
             <div class="image-display-container">
                 <img id="imageDisplay" class="image-display" src="" alt="Image">
-                <div id="imageIdDisplay"></div>
+                <div>
+                    <label for="imageIdInput">Image ID: </label>
+                    <input type="text" id="imageIdInput" class="form-control">
+                </div>
             </div>
             <div class="table-wrapper">
-                <table id="dataTable" class="table table-bordered table-striped">
+                <table id="dataTable" class="table table-bordered">
                     <thead>
                         <tr>
                             <th>Model Name</th>
@@ -120,6 +123,37 @@
     </div>
 
     <script>
+        // Default JSON File Paths
+        const defaultJsonPaths = [
+            '../unimodal_baseline/language/LSTM_outputs_train.json',
+            '../unimodal_baseline/language/T5_outputs_train.json',
+            '../unimodal_baseline/vision/resnet_outputs_train.txt',
+            '../unimodal_baseline/vision/vit_outputs_train.txt',
+            '../multimodal_baseline/clip_outputs_train.txt',
+            '../multimodal_baseline/vit_bert_attn_outputs_train.txt',
+            '../multimodal_baseline/vit_bert_outputs_train.txt',
+            '../competitive_baseline/cross_attention/outputs_train.json',
+            '../competitive_baseline/CLIP/outputs_train.json',
+            '../competitive_baseline/VILT/ViLT_outputs_train.json'
+        ];
+
+        // Add JSON File Path input elements with default values
+        const jsonPathInputsContainer = document.querySelector('.json-path-inputs');
+        defaultJsonPaths.forEach(path => {
+            const newInputGroup = document.createElement('div');
+            newInputGroup.className = 'input-group json-path-input';
+            newInputGroup.innerHTML = `
+                <div class="input-group-prepend">
+                    <span class="input-group-text">JSON File Path</span>
+                </div>
+                <input type="text" class="form-control json-path" value="${path}" placeholder="Enter JSON file path">
+                <div class="input-group-append">
+                    <button class="btn btn-danger remove-json-path" type="button">Remove</button>
+                </div>
+            `;
+            jsonPathInputsContainer.appendChild(newInputGroup);
+        });
+
         let groupedData = {};
         let groupedDataArray = [];
         let dataPath = '';
@@ -165,7 +199,7 @@
                             });
                         });
                     });
-                    groupedDataArray = Object.values(groupedData);
+                    groupedDataArray = Object.values(groupedData).sort((a, b) => a[0].image_id.localeCompare(b[0].image_id));
                     currentIndex = 0;
                     displayData();
                 })
@@ -190,23 +224,28 @@
             }
         });
 
+        document.getElementById('imageIdInput').addEventListener('change', (event) => {
+            const imageId = event.target.value;
+            const index = groupedDataArray.findIndex(items => items[0].image_id === imageId);
+            if (index === -1) {
+                alert('Image ID not found.');
+            } else {
+                currentIndex = index;
+                displayData();
+            }
+        });
+
         function displayData() {
             const dataTableBody = document.querySelector('#dataTable tbody');
             dataTableBody.innerHTML = '';
             const items = groupedDataArray[currentIndex];
             const imageDisplay = document.getElementById('imageDisplay');
-            const imageIdDisplay = document.getElementById('imageIdDisplay');
-            imageDisplay.src = `${dataPath}${items[0].image_id}.jpg`;
-            imageIdDisplay.textContent = `Image ID: ${items[0].image_id}`;
+            const imageIdInput = document.getElementById('imageIdInput');
+            imageDisplay.src = dataPath + items[0].image_id + '.jpg';
+            imageIdInput.value = items[0].image_id;
             items.forEach(item => {
                 const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${item.model_name}</td>
-                    <td>${item.metadata}</td>
-                    <td>${item.question}</td>
-                    <td>${item.predicted_answer}</td>
-                    <td>${item.target_answer}</td>
-                `;
+                row.innerHTML = `<td>${item.model_name}</td> <td><pre>${item.metadata}</pre></td> <td>${item.question}</td> <td>${item.predicted_answer}</td> <td>${item.target_answer}</td>`;
                 dataTableBody.appendChild(row);
             });
         }
@@ -214,6 +253,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 
 </body>
 
