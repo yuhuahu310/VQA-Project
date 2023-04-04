@@ -69,7 +69,6 @@ class TransformerDecoder(nn.Module):
         self.positional_encoding = PositionalEncoding(embed_dim, max_len=max_length)
         
         self.bert = BertModel.from_pretrained("bert-base-uncased")
-        self.bert.resize_token_embeddings(new_token_size)
         
         # 1. Get pretrained weights for ViT-Base
         self.pretrained_vit_weights = torchvision.models.ViT_B_16_Weights.DEFAULT

@@ -35,16 +35,16 @@ NUM_EPOCH = 100
 device = 'cuda'
 
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-print("old_token_size:", len(tokenizer))
-vqa = VQA(annotation_file=os.path.join("../data/Annotations/train.json"))
-added = tokenizer.add_tokens(list(vqa.get_vocab()))
-print(added, "tokens are added to tokenizer")
-vqa = VQA(annotation_file=os.path.join("../data/Annotations/val.json"))
-added = tokenizer.add_tokens(list(vqa.get_vocab()))
-print(added, "tokens are added to tokenizer")
-# add new, random embeddings for the new tokens
-new_token_size = len(tokenizer)
-print("new_token_size:", new_token_size)
+# print("old_token_size:", len(tokenizer))
+# vqa = VQA(annotation_file=os.path.join("../data/Annotations/train.json"))
+# added = tokenizer.add_tokens(list(vqa.get_vocab()))
+# print(added, "tokens are added to tokenizer")
+# vqa = VQA(annotation_file=os.path.join("../data/Annotations/val.json"))
+# added = tokenizer.add_tokens(list(vqa.get_vocab()))
+# print(added, "tokens are added to tokenizer")
+# # add new, random embeddings for the new tokens
+# new_token_size = len(tokenizer)
+# print("new_token_size:", new_token_size)
 pretrained_vit_weights = torchvision.models.ViT_B_16_Weights.DEFAULT
 train_dataset = VQA_mm2_Dataset("../data", "train", img_transforms=pretrained_vit_weights.transforms(), tokenizer=tokenizer)
 qa_dataset_val = VQA_mm2_Dataset("../data", "val", img_transforms=pretrained_vit_weights.transforms(), tokenizer=tokenizer)
