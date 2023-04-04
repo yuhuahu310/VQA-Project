@@ -40,9 +40,11 @@ def get_accuracy(path):
     print('\tAccuracy by answer type: '+', '.join([k + ': ' + f'{v:.4f}' for k, v in acc_dict.items()]))
 
 if __name__ == '__main__':
-    filenames = ['../unimodal_baseline/language/LSTM_outputs_val.json', '../unimodal_baseline/language/T5_outputs_val.json', # language baselines
-                 '../unimodal_baseline/vision/resnet_outputs_val.txt', '../unimodal_baseline/vision/vit_outputs_val.txt', # vision baselines
-                 '../multimodal_baseline/clip_outputs_val.txt', # simple multimodal
-                 '../competitive_baseline/cross_attention/outputs_val.json', '../competitive_baseline/CLIP/outputs_val.json'] # competitive multimodal
+    filenames = ['../unimodal_baseline/language/LSTM_outputs_{mode}.json', '../unimodal_baseline/language/T5_outputs_{mode}.json', # language baselines
+                '../unimodal_baseline/vision/resnet_outputs_{mode}.txt', '../unimodal_baseline/vision/vit_outputs_{mode}.txt', # vision baselines
+                '../multimodal_baseline/clip_outputs_{mode}.txt', # simple multimodal
+                '../competitive_baseline/cross_attention/outputs_{mode}.json', '../competitive_baseline/CLIP/outputs_{mode}.json', # competitive multimodal
+                '../competitive_baseline/VILT/ViLT_outputs_{mode}.json'] # competitive multimodal
     for path in filenames:
-        get_accuracy(path)
+        for mode in ['train', 'val']:
+            get_accuracy(path.format(mode=mode))
