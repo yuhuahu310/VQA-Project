@@ -7,6 +7,8 @@ from nltk.tokenize import RegexpTokenizer
 from torchvision import transforms
 import numpy as np
 from vqa import VQA
+import clip
+from PIL import Image
 from torch.nn import functional as F
 
 SOS_TOKEN = "<sos>"
@@ -63,7 +65,7 @@ class VQADataset(Dataset):
         img_arr = resize(img_arr, (224, 224))
         img_tensor = torch.tensor(img_arr)
         img_tensor = torch.permute(img_tensor, (2, 0, 1))
-        img_tensor = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])(img_tensor)
+
 
         # Convert answers and questions to index sequence
         qa_pair = self.vqa.dataset[idx]
@@ -75,9 +77,74 @@ class VQADataset(Dataset):
 
         q_vec = self._sent_2_idx_seq(question)
         a_vec = self._sent_2_idx_seq(answer)
-        return img_tensor, torch.tensor(q_vec, dtype=torch.int), torch.tensor(a_vec, dtype=torch.int)
+        return img_tensor, torch.tensor(q_vec, dtype=torch.int), torch.tensor(a_vec, dtype=torch.int), image_id
 
+class VQA_mm_Dataset(VQADataset):
+    def __init__(self, ds_path, phase, tokenize=True, include_imageid=False, include_q_vector=True):
+        super().__init__(ds_path, phase)
+        self.model, self.preprocess = clip.load("ViT-B/32", device="cuda")
+        self.include_q_vector = include_q_vector
 
+    def __getitem__(self, idx):
+        '''Return images, questions, and answers
+        '''
+        qa_pair = self.vqa.dataset[idx]
+        image_id = qa_pair['image']
+        answers = qa_pair['answers']
+        question = qa_pair['question']
+
+        # Get image and convert to tensor
+        img_fpath = os.path.join(self.ds_path, self.phase, image_id)
+        # img_arr = io.imread(img_fpath)
+        image = Image.open(img_fpath).convert("RGB")
+        img_tensor = self.preprocess(image)
+
+        # Convert answers and questions to index sequence
+        flat_answers = [i['answer'] for i in answers]
+        # In case of a tie, pick the first. Might consider pick randomly
+        answer = max(flat_answers, key=flat_answers.count)
+        a_vec = self._sent_2_idx_seq(answer)
+
+        question = clip.tokenize(question).squeeze(0)
+        answer = clip.tokenize(answer).squeeze(0)
+
+        if self.include_q_vector:
+            q_vec = self._sent_2_idx_seq(qa_pair['question'])
+            return img_tensor, question, answer, torch.tensor(a_vec, dtype=torch.int), image_id, torch.tensor(q_vec, dtype=torch.int)
+
+        return img_tensor, question, answer, torch.tensor(a_vec, dtype=torch.int), image_id
+
+class VQA_mm2_Dataset(VQADataset):
+    def __init__(self, ds_path, phase, img_transforms=None, tokenizer=None, include_q_vector=True):
+        super().__init__(ds_path, phase)
+        self.img_transforms = img_transforms
+        self.tokenizer = tokenizer
+        self.include_q_vector = include_q_vector
+
+    def __getitem__(self, idx):
+        '''Return images, questions, and answers
+        '''
+        qa_pair = self.vqa.dataset[idx]
+        image_id = qa_pair['image']
+        answers = qa_pair['answers']
+        question = qa_pair['question']
+
+        # Get image and convert to tensor
+        img_fpath = os.path.join(self.ds_path, self.phase, image_id)
+        image = Image.open(img_fpath).convert("RGB")
+        img_tensor = self.img_transforms(image)
+
+        # Convert answers and questions to index sequence
+        flat_answers = [i['answer'] for i in answers]
+        # In case of a tie, pick the first. Might consider pick randomly
+        answer = max(flat_answers, key=flat_answers.count)
+        a_vec = self._sent_2_idx_seq(answer)
+        question = self.tokenizer.encode_plus(question, add_special_tokens=True, return_tensors = 'pt')['input_ids'][0]
+        if self.include_q_vector:
+            q_vec = self._sent_2_idx_seq(qa_pair['question'])
+            return img_tensor, question,  torch.tensor(a_vec, dtype=torch.int), image_id, torch.tensor(q_vec, dtype=torch.int)
+
+        return img_tensor, question,  torch.tensor(a_vec, dtype=torch.int), image_id
 
 class QADataset(VQADataset):
     def __init__(self, ds_path, phase, tokenize=True, include_imageid=False):
@@ -121,10 +188,36 @@ def collate_fn_pad_image(batch):
     answers = torch.nn.utils.rnn.pad_sequence([t[2] for t in batch], padding_value=2, batch_first=True)
     img_list = [t[0] for t in batch]
     images = torch.stack(img_list, dim=0)
-    return images, questions, answers
+    image_ids = [t[3] for t in batch]
+    return images, questions, answers, image_ids
+
+def collate_fn_pad_mm(batch):
+    img_list = [t[0] for t in batch]
+    images = torch.stack(img_list, dim=0)
+    image_ids = [t[4] for t in batch]
+    
+    # clip tokenized
+    question_list = [t[1] for t in batch]
+    questions = torch.stack(question_list, dim=0)
+
+    answers = torch.nn.utils.rnn.pad_sequence([t[3] for t in batch], padding_value=2, batch_first=True)
+    questions_vec = torch.nn.utils.rnn.pad_sequence([t[5] for t in batch], padding_value=2, batch_first=True)
+    return images, questions, answers, image_ids, questions_vec
+
+# img_tensor, question, answer, torch.tensor(a_vec, dtype=torch.int), image_id
+def collate_fn_pad_mm2(batch):
+    img_list = [t[0] for t in batch]
+    images = torch.stack(img_list, dim=0)
+    image_ids = [t[3] for t in batch]
+    
+    # tokenized
+    questions = torch.nn.utils.rnn.pad_sequence([t[1] for t in batch], padding_value=0, batch_first=True)
+    answers_vec = torch.nn.utils.rnn.pad_sequence([t[2] for t in batch], padding_value=2, batch_first=True)
+    questions_vec = torch.nn.utils.rnn.pad_sequence([t[4] for t in batch], padding_value=2, batch_first=True)
+    return images, questions, answers_vec, questions_vec, image_ids
 
 
 if __name__ == '__main__':
-    vqa_dataset = VQADataset("../data", "train")
+    vqa_dataset = VQA_mm_Dataset("../data", "train")
     print(f'len of dataset is {len(vqa_dataset)}')
     print(vqa_dataset.getQA(0))
