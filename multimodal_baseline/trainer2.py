@@ -9,7 +9,7 @@ import torch
 
 class Trainer(object):
 
-    def __init__(self, model, train_dataloader, val_dataloader, word_to_idx, idx_to_word, learning_rate = 0.001, num_epochs = 10, print_every = 5, verbose = True, device = 'cuda'):
+    def __init__(self, model, train_dataloader, val_dataloader, word_to_idx, idx_to_word, learning_rate = 0.001, num_epochs = 10, print_every = 1, verbose = True, device = 'cuda'):
       
         self.model = model
         self.train_dataloader = train_dataloader
