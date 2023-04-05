@@ -67,6 +67,7 @@ class Trainer(object):
                 num_batches += 1
                 
             self.loss_history.append(epoch_loss/num_batches)
+
             if self.verbose and (i +1) % self.print_every == 0:
                 self.val_loss_history.append(self.val())
                 print( "(epoch %d / %d) loss: %f" % (i+1 , self.num_epochs, self.loss_history[-1]))    

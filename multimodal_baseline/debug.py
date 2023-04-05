@@ -20,11 +20,17 @@ EOS_TOKEN = "<eos>"
 PAD_TOKEN = "<pad>"
 OOV_TOKEN = "<oov>"
 
+with open("vit_bert_att_HID_DIM_128_outputs_val.txt", 'r') as f:
+    res = json.load(f)
+for group in res['data']:
+    if not group['predicted_answer'] == "unanswerable <eos>":
+        print(group)
 
-train_loss = np.load('hidden64_layer2_train_loss.npy')
-val_loss = np.load('hidden64_layer2_val_loss.npy')
-print(train_loss)
-print(val_loss)
+
+# train_loss = np.load('hidden64_layer2_train_loss.npy')
+# val_loss = np.load('hidden64_layer2_val_loss.npy')
+# print(train_loss)
+# print(val_loss)
 
 # device = 'cuda'
 #

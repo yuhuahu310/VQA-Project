@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 #SBATCH --time=04:00:00
-#SBATCH --job-name=vqa_128_6
+#SBATCH --job-name=vqa_dim_256
 #SBATCH --chdir=/home/katehu/vqa/multimodal_baseline
 #
 #SBATCH --nodes=1
@@ -15,5 +15,6 @@
 #SBATCH --mail-type=end          # send email when job ends
 #SBATCH --mail-user=katehu310@gmail.com
 
-srun python -u run3.py --hidden 128 --layers 6 --exp hidden128_layer6 --epoch 20
+# srun python -u run3_new.py --hidden 128 --layers 6 --exp hidden128_layer6 --epoch 20
 
+srun python -u run3_new.py --param HID_DIM --value 256

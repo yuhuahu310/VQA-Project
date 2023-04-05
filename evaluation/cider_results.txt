@@ -1,0 +1,26 @@
+Mode:  val
+loading dataset into memory...
+0:00:00.085401
+../unimodal_baseline/language/LSTM_outputs_val.json: 0.39137930705227403
+../unimodal_baseline/language/T5_outputs_val.json: 0.7381931055468396
+../unimodal_baseline/vision/resnet_outputs_val.txt: 0.1243622375045736
+../unimodal_baseline/vision/vit_outputs_val.txt: 0.06581027717677401
+../multimodal_baseline/clip_outputs_val.txt: 0.11502030750162107
+../multimodal_baseline/vit_bert_outputs_val.txt: 0.0774848380458034
+../multimodal_baseline/vit_bert_att_HID_DIM_128_outputs_val.txt: 0.042512418082351164
+../competitive_baseline/cross_attention/outputs_val.json: 1.1788516632002395
+../competitive_baseline/CLIP/outputs_val.json: 1.6634982816275807
+../competitive_baseline/VILT/ViLT_outputs_val.json: 0.29402106121574206
+Mode:  train
+loading dataset into memory...
+0:00:00.381021
+../unimodal_baseline/language/LSTM_outputs_train.json: 0.9946192217683603
+../unimodal_baseline/language/T5_outputs_train.json: 0.7610057878840638
+../unimodal_baseline/vision/resnet_outputs_train.txt: 0.8893006774163245
+../unimodal_baseline/vision/vit_outputs_train.txt: 0.5938798541605889
+../multimodal_baseline/clip_outputs_train.txt: 0.8740892624997637
+../multimodal_baseline/vit_bert_outputs_train.txt: 0.7929095312927427
+../multimodal_baseline/vit_bert_att_HID_DIM_128_outputs_train.txt: 0.03695299736406289
+../competitive_baseline/cross_attention/outputs_train.json: 1.2902302929809721
+../competitive_baseline/CLIP/outputs_train.json: 1.7735953761587908
+../competitive_baseline/VILT/ViLT_outputs_train.json: 0.31833151924612746
