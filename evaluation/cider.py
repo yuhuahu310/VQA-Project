@@ -42,9 +42,6 @@ class Cider:
 
             cider_scorer += (hypo[0], ref)
 
-        print(len(cider_scorer.crefs))
-        print(len(cider_scorer.ctest))
-
         (score, scores) = cider_scorer.compute_score()
 
         return score, scores
@@ -59,26 +56,44 @@ if __name__ == "__main__":
     # config
     ds_path = "../../../../net/projects/ranalab/kh310/vqa"
 
-    vqa_val = VQA(annotation_file=os.path.join(ds_path, 'Annotations', f'val.json'))
-    vqa_train = VQA(annotation_file=os.path.join(ds_path, 'Annotations', f'train.json'))
+    for mode in ['val', 'train']:
+        print("Mode: ", mode)
+        vqa_ds = VQA(annotation_file=os.path.join(ds_path, 'Annotations', f'{mode}.json'))
+        gts = {}
+        for qa_pair in vqa_ds.dataset:
+            ans = [i['answer'] for i in qa_pair['answers']]
+            gts[qa_pair['image']] = ans
+
+        FILENAMES = [
+            # unimodal baselines
+            f'../unimodal_baseline/language/LSTM_outputs_{mode}.json',
+            f'../unimodal_baseline/language/T5_outputs_{mode}.json',  # language
+            f'../unimodal_baseline/vision/resnet_outputs_{mode}.txt', f'../unimodal_baseline/vision/vit_outputs_{mode}.txt',
+            # vision
+
+            # simple multimodal baselines
+            f'../multimodal_baseline/clip_outputs_{mode}.txt',
+            f'../multimodal_baseline/vit_bert_outputs_{mode}.txt',
+            f'../multimodal_baseline/vit_bert_att_HID_DIM_128_outputs_{mode}.txt',
+
+            # competitive multimodal baselines
+            f'../competitive_baseline/cross_attention/outputs_{mode}.json',
+            f'../competitive_baseline/CLIP/outputs_{mode}.json',
+            f'../competitive_baseline/VILT/ViLT_outputs_{mode}.json'
+        ]  # competitive multimodal
 
 
-    result_fpath = '../multimodal_baseline/clip_outputs_val.txt'
+        for result_fpath in FILENAMES:
+
+            with open(result_fpath, 'r') as f:
+                result = json.load(f)
+
+            res = {}
+
+            for group in result['data']:
+                res[group['image_id']+'.jpg'] = [group['predicted_answer']]
 
 
-    with open(result_fpath, 'r') as f:
-        result = json.load(f)
+            score, scores = cider.compute_score(gts, res)
 
-    res = {}
-    gts = {}
-    for group in result['data']:
-        res[group['image_id']+'.jpg'] = [group['predicted_answer']]
-    for qa_pair in vqa_ds.dataset:
-        ans = [i['answer'] for i in qa_pair['answers']]
-        gts[qa_pair['image']] = ans
-
-
-
-    score, scores = cider.compute_score(gts, res)
-
-    print(score)
+            print(f'{result_fpath}: {score}')

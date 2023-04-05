@@ -160,7 +160,6 @@ class CiderScorer(object):
         scores = []
         for test, refs in zip(self.ctest, self.crefs):
             # compute vector for test captions
-            print('test:', test)
             vec, norm, length = counts2vec(test)
             # compute vector for ref captions
             score = np.array([0.0 for _ in range(self.n)])
