@@ -9,23 +9,17 @@
             margin-top: 20px;
         }
 
-        .image-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        .json-path-inputs {
+            margin-bottom: 10px;
         }
 
-        .image-info {
-            margin-left: 20px;
-            width: 60%;
+        .json-path-input {
+            margin-bottom: 5px;
         }
 
         .navigation {
             margin-top: 20px;
-        }
-
-        #imageDisplay {
-            max-width: 33%;
+            text-align: center;
         }
 
         .field-name {
@@ -44,68 +38,169 @@
             flex-basis: auto;
             margin-left: 10px;
         }
+
+        .table-container {
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+
+        .table-image {
+            width: 100px;
+        }
+
+        .image-display-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .image-display {
+            width: 200px;
+            /* Fixed width for the image */
+        }
+
+        .content-wrapper {
+            display: flex;
+        }
+
+        .table-wrapper {
+            flex-grow: 1;
+            margin-bottom: 20px;
+            /* Space below the table */
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
         <h2 class="text-center">VQA Sample Viewer</h2>
-        <div class="input-group-container">
-            <div class="input-group-wrapper">
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">JSON File Path</span>
-                    </div>
-                    <input type="text" id="jsonPathInput" class="form-control" placeholder="Enter JSON file path">
+        <div class="json-path-inputs">
+            <!-- <div class="input-group json-path-input">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">JSON File Path</span>
                 </div>
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">Image Data Path</span>
-                    </div>
-                    <input type="text" id="dataPathInput" class="form-control" value="../data/Images/val/"
-                        placeholder="Enter image data path">
+                <input type="text" class="form-control json-path" placeholder="Enter JSON file path">
+                <div class="input-group-append">
+                    <button class="btn btn-danger remove-json-path" type="button">Remove</button>
                 </div>
-            </div>
-            <button id="jsonPathSubmitButton" class="btn btn-primary mb-3 align-self-stretch">Load JSON</button>
+            </div> -->
         </div>
-        <div class="card mb-3">
-            <div class="card-body">
-                <span class="field-name">Model Name:</span> <span id="modelName"></span><br>
-                <span class="field-name">Metadata:</span> <span id="metadata"></span>
+        <button id="addJsonPathButton" class="btn btn-secondary mb-3">Add JSON Path</button>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Image Data Path</span>
             </div>
+            <input type="text" id="dataPathInput" class="form-control" value="../data/Images/train/"
+                placeholder="Enter image data path">
         </div>
-        <div class="image-container">
-            <img id="imageDisplay" src="" alt="Image" class="img-thumbnail">
-            <div class="image-info">
-                <span class="field-name">Image ID:</span> <span id="imageId"></span><br>
-                <span class="field-name">Question:</span> <span id="question"></span><br>
-                <span class="field-name">Predicted Answer:</span> <span id="predictedAnswer"></span><br>
-                <span class="field-name">Target Answer:</span> <span id="targetAnswer"></span>
-            </div>
-        </div>
+        <button id="jsonPathSubmitButton" class="btn btn-primary mb-3">Load JSON</button>
         <div class="navigation">
-            <button id="leftArrowButton" class="btn btn-secondary">&#8592;</button>
-            <input type="number" id="currentIndexInput" class="form-control" style="width: 80px; display: inline;">
-            <span id="totalItems"></span>
-            <button id="rightArrowButton" class="btn btn-secondary">&#8594;</button>
+            <button id="leftArrowButton" class="btn btn-secondary">&#8592; Previous</button>
+            <button id="rightArrowButton" class="btn btn-secondary">Next &#8594;</button>
+        </div>
+        <div class="content-wrapper">
+            <div class="image-display-container">
+                <img id="imageDisplay" class="image-display" src="" alt="Image">
+                <div>
+                    <label for="imageIdInput">Image ID: </label>
+                    <input type="text" id="imageIdInput" class="form-control">
+                </div>
+            </div>
+            <div class="table-wrapper">
+                <table id="dataTable" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Model Name</th>
+                            <th>Metadata</th>
+                            <th>Question</th>
+                            <th>Predicted Answer</th>
+                            <th>Target Answer</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
     <script>
-        let jsonData = null;
-        let currentDataIndex = 0;
+        // Default JSON File Paths
+        const defaultJsonPaths = [
+            '../unimodal_baseline/language/LSTM_outputs_train.json',
+            '../unimodal_baseline/language/T5_outputs_train.json',
+            '../unimodal_baseline/vision/resnet_outputs_train.txt',
+            '../unimodal_baseline/vision/vit_outputs_train.txt',
+            '../multimodal_baseline/clip_outputs_train.txt',
+            '../multimodal_baseline/vit_bert_attn_outputs_train.txt',
+            '../multimodal_baseline/vit_bert_outputs_train.txt',
+            '../competitive_baseline/cross_attention/outputs_train.json',
+            '../competitive_baseline/CLIP/outputs_train.json',
+            '../competitive_baseline/VILT/ViLT_outputs_train.json'
+        ];
+
+        // Add JSON File Path input elements with default values
+        const jsonPathInputsContainer = document.querySelector('.json-path-inputs');
+        defaultJsonPaths.forEach(path => {
+            const newInputGroup = document.createElement('div');
+            newInputGroup.className = 'input-group json-path-input';
+            newInputGroup.innerHTML = `
+                <div class="input-group-prepend">
+                    <span class="input-group-text">JSON File Path</span>
+                </div>
+                <input type="text" class="form-control json-path" value="${path}" placeholder="Enter JSON file path">
+                <div class="input-group-append">
+                    <button class="btn btn-danger remove-json-path" type="button">Remove</button>
+                </div>
+            `;
+            jsonPathInputsContainer.appendChild(newInputGroup);
+        });
+
+        let groupedData = {};
+        let groupedDataArray = [];
         let dataPath = '';
+        let currentIndex = 0;
+
+        document.getElementById('addJsonPathButton').addEventListener('click', () => {
+            const newInputGroup = document.createElement('div');
+            newInputGroup.className = 'input-group json-path-input';
+            newInputGroup.innerHTML = `
+                <div class="input-group-prepend">
+                    <span class="input-group-text">JSON File Path</span>
+                </div>
+                <input type="text" class="form-control json-path" placeholder="Enter JSON file path">
+                <div class="input-group-append">
+                    <button class="btn btn-danger remove-json-path" type="button">Remove</button>
+                </div>
+            `;
+            document.querySelector('.json-path-inputs').appendChild(newInputGroup);
+        });
+
+        document.querySelector('.json-path-inputs').addEventListener('click', (event) => {
+            if (event.target.classList.contains('remove-json-path')) {
+                event.target.closest('.json-path-input').remove();
+            }
+        });
+
         document.getElementById('jsonPathSubmitButton').addEventListener('click', () => {
-            const jsonPath = document.getElementById('jsonPathInput').value;
+            groupedData = {};
             dataPath = document.getElementById('dataPathInput').value;
-            fetch(jsonPath)
-                .then(response => response.json())
-                .then(data => {
-                    jsonData = data;
-                    // Sort the data items by the "image_id" field in ascending order
-                    jsonData.data.sort((a, b) => a.image_id.localeCompare(b.image_id));
-                    currentDataIndex = 0;
-                    document.getElementById('totalItems').textContent = '/' + jsonData.data.length;
+            const jsonPaths = document.querySelectorAll('.json-path');
+            const promises = Array.from(jsonPaths).map(input => fetch(input.value).then(response => response.json()));
+            Promise.all(promises)
+                .then(dataArray => {
+                    dataArray.forEach(data => {
+                        data.data.forEach(item => {
+                            if (!groupedData[item.image_id]) {
+                                groupedData[item.image_id] = [];
+                            }
+                            groupedData[item.image_id].push({
+                                model_name: data.model_name,
+                                metadata: JSON.stringify(data.metadata, null, 2),
+                                ...item
+                            });
+                        });
+                    });
+                    groupedDataArray = Object.values(groupedData).sort((a, b) => a[0].image_id.localeCompare(b[0].image_id));
+                    currentIndex = 0;
                     displayData();
                 })
                 .catch(error => {
@@ -113,45 +208,53 @@
                 });
         });
 
-        document.getElementById('leftArrowButton').addEventListener('click', () => {
-            if (jsonData && currentDataIndex > 0) {
-                currentDataIndex--;
+        document.getElementById('leftArrowButton').addEventListener('click', (event) => {
+            event.preventDefault();
+            if (currentIndex > 0) {
+                currentIndex--;
                 displayData();
             }
         });
 
-        document.getElementById('rightArrowButton').addEventListener('click', () => {
-            if (jsonData && currentDataIndex < jsonData.data.length - 1) {
-                currentDataIndex++;
+        document.getElementById('rightArrowButton').addEventListener('click', (event) => {
+            event.preventDefault();
+            if (currentIndex < groupedDataArray.length - 1) {
+                currentIndex++;
                 displayData();
             }
         });
 
-        document.getElementById('currentIndexInput').addEventListener('change', () => {
-            const newIndex = parseInt(document.getElementById('currentIndexInput').value) - 1;
-            if (jsonData && newIndex >= 0 && newIndex < jsonData.data.length) {
-                currentDataIndex = newIndex;
-                displayData();
+        document.getElementById('imageIdInput').addEventListener('change', (event) => {
+            const imageId = event.target.value;
+            const index = groupedDataArray.findIndex(items => items[0].image_id === imageId);
+            if (index === -1) {
+                alert('Image ID not found.');
             } else {
-                alert('Index out of bounds!');
+                currentIndex = index;
+                displayData();
             }
         });
 
         function displayData() {
-            if (!jsonData) return;
-            const dataItem = jsonData.data[currentDataIndex];
-            document.getElementById('imageDisplay').src = dataPath + dataItem.image_id + '.jpg';
-            document.getElementById('imageId').textContent = dataItem.image_id;
-            document.getElementById('question').textContent = dataItem.question;
-            document.getElementById('predictedAnswer').textContent = dataItem.predicted_answer;
-            document.getElementById('targetAnswer').textContent = dataItem.target_answer;
-            document.getElementById('modelName').textContent = jsonData.model_name;
-            document.getElementById('metadata').textContent = JSON.stringify(jsonData.metadata, null, 2);
-            document.getElementById('currentIndexInput').value = currentDataIndex + 1;
+            const dataTableBody = document.querySelector('#dataTable tbody');
+            dataTableBody.innerHTML = '';
+            const items = groupedDataArray[currentIndex];
+            const imageDisplay = document.getElementById('imageDisplay');
+            const imageIdInput = document.getElementById('imageIdInput');
+            imageDisplay.src = dataPath + items[0].image_id + '.jpg';
+            imageIdInput.value = items[0].image_id;
+            items.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${item.model_name}</td> <td><pre>${item.metadata}</pre></td> <td>${item.question}</td> <td>${item.predicted_answer}</td> <td>${item.target_answer}</td>`;
+                dataTableBody.appendChild(row);
+            });
         }
     </script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
 </body>
 
 </html>

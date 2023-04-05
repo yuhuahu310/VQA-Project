@@ -1,5 +1,5 @@
 from torchtext.data.metrics import bleu_score
-from common import tokenize, process_answer
+from common import tokenize, process_answer, FILENAMES
 import json
 
 def build_reference_corpus(mode, unique_only=True):
@@ -28,6 +28,7 @@ def compute_bleu_score(candidate_corpus, reference_corpus):
         if image_id in reference_corpus:
             cands.append(pred)
             refs.append(reference_corpus[image_id])
+    # breakpoint()
     return bleu_score(cands, refs)
 
 if __name__ == '__main__':
@@ -35,12 +36,8 @@ if __name__ == '__main__':
         'train': build_reference_corpus('train'),
         'val': build_reference_corpus('val')
     }
-    filenames = ['../unimodal_baseline/language/LSTM_outputs_{mode}.json', '../unimodal_baseline/language/T5_outputs_{mode}.json', # language baselines
-                '../unimodal_baseline/vision/resnet_outputs_{mode}.txt', '../unimodal_baseline/vision/vit_outputs_{mode}.txt', # vision baselines
-                '../multimodal_baseline/clip_outputs_{mode}.txt', '../multimodal_baseline/vit_bert_attn_outputs_{mode}.txt', # simple multimodal
-                '../competitive_baseline/cross_attention/outputs_{mode}.json', '../competitive_baseline/CLIP/outputs_{mode}.json', # competitive multimodal
-                '../competitive_baseline/VILT/ViLT_outputs_{mode}.json'] # competitive multimodal
-    for path in filenames:
+    # FILENAMES = ['../unimodal_baseline/language/T5_outputs_{mode}.json']
+    for path in FILENAMES:
         for mode in ['train', 'val']:
             candidate_corpus, model_name = build_candidate_corpus(path.format(mode=mode))
             score = compute_bleu_score(

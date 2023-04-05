@@ -60,6 +60,22 @@ Model name: clip
         Mode: val
         Overall accuracy: 0.4520
         Accuracy by answer type: unanswerable: 0.8055, other: 0.2615, yes/no: 0.6031, number: 0.3167
+Model name: vit_bert_attn
+        Mode: train
+        Overall accuracy: 0.0000
+        Accuracy by answer type: other: 0.0000, unanswerable: 0.0000, number: 0.0000, yes/no: 0.0000
+Model name: vit_bert_attn
+        Mode: val
+        Overall accuracy: 0.0000
+        Accuracy by answer type: unanswerable: 0.0000, other: 0.0000, yes/no: 0.0000, number: 0.0000
+Model name: vit_bert
+        Mode: train
+        Overall accuracy: 0.8676
+        Accuracy by answer type: other: 0.8129, unanswerable: 0.9875, yes/no: 0.9541, number: 0.8877
+Model name: vit_bert
+        Mode: val
+        Overall accuracy: 0.3593
+        Accuracy by answer type: unanswerable: 0.6569, other: 0.2132, yes/no: 0.2995, number: 0.2063
 Model name: CompetitiveBaseline_CrossAttention
         Mode: train
         Overall accuracy: 0.6658
