@@ -142,7 +142,7 @@ class VQA_mm2_Dataset(VQADataset):
         question = self.tokenizer.encode_plus(question, add_special_tokens=True, return_tensors = 'pt')['input_ids'][0]
         if self.include_q_vector:
             q_vec = self._sent_2_idx_seq(qa_pair['question'])
-            return img_tensor, question,  torch.tensor(a_vec, dtype=torch.int), image_id, torch.tensor(q_vec, dtype=torch.int)
+            return img_tensor, question, torch.tensor(a_vec, dtype=torch.int), image_id, torch.tensor(q_vec, dtype=torch.int)
 
         return img_tensor, question,  torch.tensor(a_vec, dtype=torch.int), image_id
 

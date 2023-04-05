@@ -59,10 +59,10 @@ class TransformerDecoder(nn.Module):
         self.new_token_size = new_token_size
         self.vocab_size = vocab_size
         
-        decoder_layer = nn.TransformerDecoderLayer(d_model=embed_dim, nhead=num_heads, batch_first=True, dropout=0.3)
+        decoder_layer = nn.TransformerDecoderLayer(d_model=embed_dim, nhead=num_heads, batch_first=True)
         self.layers = nn.ModuleList([decoder_layer for _ in range(num_layers)])
 
-        encoder_layer = nn.TransformerEncoderLayer(d_model=768, nhead=4, batch_first=True, dropout=0.3)
+        encoder_layer = nn.TransformerEncoderLayer(d_model=768, nhead=4, batch_first=True)
         self.encoder = nn.TransformerEncoder(encoder_layer=encoder_layer, num_layers=2).to(device)
 
         self.caption_embedding = nn.Embedding(vocab_size, embed_dim, padding_idx=self._null)

@@ -45,7 +45,6 @@ transformer = TransformerDecoder(
           input_dim=ENC_EMB_DIM,
           embed_dim=HID_DIM,
           new_token_size = new_token_size,
-
           vocab_size=VOCAB_SIZE,
           num_heads=4,
           num_layers=N_LAYERS,
@@ -76,7 +75,8 @@ def vis_imgs(split, model_name):
                 plt.savefig('plots_%s/' % model_name + exp_name + '_%s_%d.png' % (split, num_imgs))
                 num_imgs += 1
                 if num_imgs >= 16: break
-        return 
+        return
+
 
 def eval(model, model_name, loader, criterion, split='val', dump=''):
     all_image_ids = []
@@ -84,15 +84,14 @@ def eval(model, model_name, loader, criterion, split='val', dump=''):
     all_targets = []
     all_predictions = []
     total_loss = 0
-    for i, batch in enumerate(loader):
-        print(f"batch: {i}")
-        features, questions, answers, image_ids = batch
-        gt_answers = decode_captions_bert(answers.numpy(), tokenizer)
-        logits = model(features.float().cuda(), questions.cuda(), answers[:,:-1].cuda())
-        output, logits = model.sample(features.float().cuda(), questions.cuda(), max_length=answers.shape[1]-1)
-        sample_answers = decode_captions_bert(output, tokenizer)
-        gt_questions = decode_captions_bert(questions.numpy(), tokenizer)
-        # import pdb; pdb.set_trace()
+    for batch in loader:
+        features, questions, answers, questions_org, image_ids = batch
+
+        gt_answers = decode_captions(answers.numpy(), train_dataset.reverse_vocab)
+        logits = model(features.float().cuda(), questions.cuda(), answers[:, :-1].cuda())
+        output, logits = model.sample(features.float().cuda(), questions.cuda(), max_length=answers.shape[1] - 1)
+        sample_answers = decode_captions(output, train_dataset.reverse_vocab)
+        gt_questions = decode_captions(questions_org.numpy(), train_dataset.reverse_vocab)
 
         loss = criterion(logits, answers[:, 1:].long().to("cuda"))
         total_loss += loss
@@ -101,7 +100,7 @@ def eval(model, model_name, loader, criterion, split='val', dump=''):
         all_questions.extend(gt_questions)
         all_targets.extend(gt_answers)
         all_predictions.extend(sample_answers)
-      
+
     if dump:
         out = {
             "model_name": model_name,
@@ -133,9 +132,7 @@ def criterion(predictions, labels):
     return F.cross_entropy(predictions.reshape(-1, predictions.size(-1)), labels.reshape(-1), ignore_index=2)
 
 
-# loss: tensor(6.2143, device='cuda:0')
-# loss: tensor(0.1230, device='cuda:0')
-loss = eval(transformer, 'vit_bert_attn', val_dataloader, criterion, split='val', dump='vit_bert_attn_outputs_val.txt')
-print("val loss:", loss)
-loss = eval(transformer, 'vit_bert_attn', train_dataloader, criterion, split='train', dump='vit_bert_attn_outputs_train.txt')
-print("train loss:", loss)
+val_loss = eval(transformer, 'vit_bert_attn', val_dataloader, criterion, split='val', dump='vit_bert_attn_outputs_val.txt')
+print("val loss:", val_loss)
+train_loss = eval(transformer, 'vit_bert_attn', train_dataloader, criterion, split='train', dump='vit_bert_attn_outputs_train.txt')
+print("train loss:", train_loss)
