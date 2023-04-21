@@ -11,3 +11,4 @@ transformers
 chardet
 clip
 torchtext
+pytesseract
