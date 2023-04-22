@@ -472,3 +472,4 @@ data/
 unimodal_baseline/language/outputs/
 unimodal_baseline/language/lightning_logs/
 unimodal_baseline/language/LSTM_ckpt/
+quality_detector/Annotations

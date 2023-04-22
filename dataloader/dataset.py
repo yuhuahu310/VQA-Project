@@ -10,11 +10,14 @@ from vqa import VQA
 import clip
 from PIL import Image
 from torch.nn import functional as F
+import json
+import pytesseract
 
 SOS_TOKEN = "<sos>"
 EOS_TOKEN = "<eos>"
 PAD_TOKEN = "<pad>"
 OOV_TOKEN = "<oov>"
+OCR_TOKEN = "<ocr>"
 
 # TODO: add padding and field to tackle sos/eos
 class VQADataset(Dataset):
@@ -80,7 +83,7 @@ class VQADataset(Dataset):
         return img_tensor, torch.tensor(q_vec, dtype=torch.int), torch.tensor(a_vec, dtype=torch.int), image_id
 
 class VQA_mm_Dataset(VQADataset):
-    def __init__(self, ds_path, phase, tokenize=True, include_imageid=False, include_q_vector=True):
+    def __init__(self, ds_path, phase, tokenize=True, include_imageid=False, include_q_vector=True, load_ocr=None):
         super().__init__(ds_path, phase)
         self.model, self.preprocess = clip.load("ViT-B/32", device="cuda")
         self.include_q_vector = include_q_vector
@@ -99,6 +102,12 @@ class VQA_mm_Dataset(VQADataset):
         image = Image.open(img_fpath).convert("RGB")
         img_tensor = self.preprocess(image)
 
+        if self.load_ocr:
+            with open(self.load_ocr) as ocr_dict:
+                ocr = json.load(ocr_dict)[str(image_id)]
+        else:
+            ocr = pytesseract.image_to_string(image)
+        ocr = OCR_TOKEN + ocr
         # Convert answers and questions to index sequence
         flat_answers = [i['answer'] for i in answers]
         # In case of a tie, pick the first. Might consider pick randomly
@@ -107,19 +116,22 @@ class VQA_mm_Dataset(VQADataset):
 
         question = clip.tokenize(question).squeeze(0)
         answer = clip.tokenize(answer).squeeze(0)
+        ocr_tokenized = clip.tokenize(ocr).squeeze(0)
 
         if self.include_q_vector:
             q_vec = self._sent_2_idx_seq(qa_pair['question'])
-            return img_tensor, question, answer, torch.tensor(a_vec, dtype=torch.int), image_id, torch.tensor(q_vec, dtype=torch.int)
+            ocr_vec = self._sent_2_idx_seq(ocr) 
+            return img_tensor, question + ocr_tokenized, answer, torch.tensor(a_vec, dtype=torch.int), image_id, torch.tensor(q_vec + ocr_vec, dtype=torch.int)
 
-        return img_tensor, question, answer, torch.tensor(a_vec, dtype=torch.int), image_id
+        return img_tensor, question + ocr_tokenized, answer, torch.tensor(a_vec, dtype=torch.int), image_id
 
 class VQA_mm2_Dataset(VQADataset):
-    def __init__(self, ds_path, phase, img_transforms=None, tokenizer=None, include_q_vector=True):
+    def __init__(self, ds_path, phase, img_transforms=None, tokenizer=None, include_q_vector=True, load_ocr=None):
         super().__init__(ds_path, phase)
         self.img_transforms = img_transforms
         self.tokenizer = tokenizer
         self.include_q_vector = include_q_vector
+        self.load_ocr = load_ocr
 
     def __getitem__(self, idx):
         '''Return images, questions, and answers
@@ -132,7 +144,14 @@ class VQA_mm2_Dataset(VQADataset):
         # Get image and convert to tensor
         img_fpath = os.path.join(self.ds_path, self.phase, image_id)
         image = Image.open(img_fpath).convert("RGB")
+        # OCR: online/offline
         img_tensor = self.img_transforms(image)
+        if self.load_ocr:
+            with open(self.load_ocr) as ocr_dict:
+                ocr = json.load(ocr_dict)[str(image_id)]
+        else:
+            ocr = pytesseract.image_to_string(image)
+        ocr = OCR_TOKEN + ocr
 
         # Convert answers and questions to index sequence
         flat_answers = [i['answer'] for i in answers]
@@ -140,11 +159,13 @@ class VQA_mm2_Dataset(VQADataset):
         answer = max(flat_answers, key=flat_answers.count)
         a_vec = self._sent_2_idx_seq(answer)
         question = self.tokenizer.encode_plus(question, add_special_tokens=True, return_tensors = 'pt')['input_ids'][0]
+        ocr_tokenized = self.tokenizer.encode_plus(ocr, add_special_tokens=True, return_tensors = 'pt')['input_ids'][0]
         if self.include_q_vector:
             q_vec = self._sent_2_idx_seq(qa_pair['question'])
-            return img_tensor, question, torch.tensor(a_vec, dtype=torch.int), image_id, torch.tensor(q_vec, dtype=torch.int)
+            ocr_vec = self._sent_2_idx_seq(ocr)
+            return img_tensor, question + ocr_tokenized, torch.tensor(a_vec, dtype=torch.int), image_id, torch.tensor(q_vec + ocr_vec, dtype=torch.int)
 
-        return img_tensor, question,  torch.tensor(a_vec, dtype=torch.int), image_id
+        return img_tensor, question + ocr_tokenized,  torch.tensor(a_vec, dtype=torch.int), image_id
 
 class QADataset(VQADataset):
     def __init__(self, ds_path, phase, tokenize=True, include_imageid=False):
