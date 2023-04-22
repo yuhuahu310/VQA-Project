@@ -21,13 +21,13 @@ OCR_TOKEN = "<ocr>"
 
 # TODO: add padding and field to tackle sos/eos
 class VQADataset(Dataset):
-    def __init__(self, ds_path, phase):
+    def __init__(self, ds_path, phase, use_all_ans=True):
         '''
 
         :param ds_path: path to directory that contains Annotations, train, val, test
         :param phase: train, val, or test
         '''
-        self.vqa = VQA(annotation_file=os.path.join(ds_path, 'Annotations', f'{phase}.json'))
+        self.vqa = VQA(annotation_file=os.path.join(ds_path, 'Annotations', f'{phase}.json'), use_all_ans=use_all_ans)
         # Get vocabulary using training data
         if phase == 'train':
             self.vocab = np.concatenate(([SOS_TOKEN, EOS_TOKEN, PAD_TOKEN, OOV_TOKEN], self.vqa.get_vocab()))
@@ -83,10 +83,16 @@ class VQADataset(Dataset):
         return img_tensor, torch.tensor(q_vec, dtype=torch.int), torch.tensor(a_vec, dtype=torch.int), image_id
 
 class VQA_mm_Dataset(VQADataset):
-    def __init__(self, ds_path, phase, tokenize=True, include_imageid=False, include_q_vector=True, load_ocr=None):
-        super().__init__(ds_path, phase)
+    def __init__(self, ds_path, phase, tokenize=True, include_imageid=False, include_q_vector=True, load_ocr=None, use_all_ans=True):
+        super().__init__(ds_path, phase, use_all_ans=use_all_ans)
         self.model, self.preprocess = clip.load("ViT-B/32", device="cuda")
         self.include_q_vector = include_q_vector
+        self.ans_types = {
+            'unanswerable': torch.tensor([0]),
+            'yes/no': torch.tensor([1]),
+            'number': torch.tensor([2]),
+            'other': torch.tensor([3])
+        }
 
     def __getitem__(self, idx):
         '''Return images, questions, and answers
@@ -95,6 +101,7 @@ class VQA_mm_Dataset(VQADataset):
         image_id = qa_pair['image']
         answers = qa_pair['answers']
         question = qa_pair['question']
+        ans_type = self.ans_types[qa_pair['answer_type']]
 
         # Get image and convert to tensor
         img_fpath = os.path.join(self.ds_path, self.phase, image_id)
@@ -102,12 +109,12 @@ class VQA_mm_Dataset(VQADataset):
         image = Image.open(img_fpath).convert("RGB")
         img_tensor = self.preprocess(image)
 
-        if self.load_ocr:
-            with open(self.load_ocr) as ocr_dict:
-                ocr = json.load(ocr_dict)[str(image_id)]
-        else:
-            ocr = pytesseract.image_to_string(image)
-        ocr = OCR_TOKEN + ocr
+        # if self.load_ocr:
+        #     with open(self.load_ocr) as ocr_dict:
+        #         ocr = json.load(ocr_dict)[str(image_id)]
+        # else:
+        #     ocr = pytesseract.image_to_string(image)
+        # ocr = OCR_TOKEN + ocr
         # Convert answers and questions to index sequence
         flat_answers = [i['answer'] for i in answers]
         # In case of a tie, pick the first. Might consider pick randomly
@@ -116,14 +123,14 @@ class VQA_mm_Dataset(VQADataset):
 
         question = clip.tokenize(question).squeeze(0)
         answer = clip.tokenize(answer).squeeze(0)
-        ocr_tokenized = clip.tokenize(ocr).squeeze(0)
+        # ocr_tokenized = clip.tokenize(ocr).squeeze(0)
 
         if self.include_q_vector:
             q_vec = self._sent_2_idx_seq(qa_pair['question'])
-            ocr_vec = self._sent_2_idx_seq(ocr) 
-            return img_tensor, question + ocr_tokenized, answer, torch.tensor(a_vec, dtype=torch.int), image_id, torch.tensor(q_vec + ocr_vec, dtype=torch.int)
+            # ocr_vec = self._sent_2_idx_seq(ocr) 
+            return img_tensor, question, answer, torch.tensor(a_vec, dtype=torch.int), image_id, torch.tensor(q_vec, dtype=torch.int), ans_type
 
-        return img_tensor, question + ocr_tokenized, answer, torch.tensor(a_vec, dtype=torch.int), image_id
+        return img_tensor, question, answer, torch.tensor(a_vec, dtype=torch.int), image_id, ans_type
 
 class VQA_mm2_Dataset(VQADataset):
     def __init__(self, ds_path, phase, img_transforms=None, tokenizer=None, include_q_vector=True, load_ocr=None):
@@ -212,10 +219,14 @@ def collate_fn_pad_image(batch):
     image_ids = [t[3] for t in batch]
     return images, questions, answers, image_ids
 
+# batch = (img_tensor, question + ocr_tokenized, answer, torch.tensor(a_vec, dtype=torch.int), image_id, torch.tensor(q_vec + ocr_vec, dtype=torch.int), ans_type)
 def collate_fn_pad_mm(batch):
     img_list = [t[0] for t in batch]
     images = torch.stack(img_list, dim=0)
     image_ids = [t[4] for t in batch]
+
+    anstype_list = [t[-1] for t in batch]
+    anstypes = torch.stack(anstype_list, dim=0)
     
     # clip tokenized
     question_list = [t[1] for t in batch]
@@ -223,7 +234,7 @@ def collate_fn_pad_mm(batch):
 
     answers = torch.nn.utils.rnn.pad_sequence([t[3] for t in batch], padding_value=2, batch_first=True)
     questions_vec = torch.nn.utils.rnn.pad_sequence([t[5] for t in batch], padding_value=2, batch_first=True)
-    return images, questions, answers, image_ids, questions_vec
+    return images, questions, answers, anstypes, image_ids, questions_vec
 
 # img_tensor, question, answer, torch.tensor(a_vec, dtype=torch.int), image_id
 def collate_fn_pad_mm2(batch):

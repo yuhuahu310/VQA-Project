@@ -23,7 +23,7 @@ from nltk.tokenize import RegexpTokenizer
 import numpy as np
 
 class VQA:
-	def __init__(self, annotation_file=None):
+	def __init__(self, annotation_file=None, use_all_ans=True):
 		"""
 	   	Constructor of VQA helper class for reading and visualizing questions and answers.
 		:param annotation_file (str): location of VQA annotation file
@@ -37,7 +37,17 @@ class VQA:
 			time_t = datetime.datetime.utcnow()
 			dataset = json.load(open(annotation_file, 'r'))
 			print(datetime.datetime.utcnow() - time_t)
-			self.dataset = dataset
+			if use_all_ans:
+				all_dataset = []
+				for qa_pair in dataset:
+					for i in range(10):
+						if qa_pair['answers'][i]['answer_confidence'] == 'yes':
+							new_qa_pair = copy.deepcopy(qa_pair)
+							new_qa_pair['answers'] = [qa_pair['answers'][i]]
+							all_dataset.append(new_qa_pair)
+				self.dataset = all_dataset
+			else:
+				self.dataset = dataset
 			self.imgToQA = {x['image']:x for x in dataset}
 
 	def getImgs(self):
