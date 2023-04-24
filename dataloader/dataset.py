@@ -12,6 +12,7 @@ from PIL import Image
 from torch.nn import functional as F
 import json
 import pytesseract
+import random
 
 SOS_TOKEN = "<sos>"
 EOS_TOKEN = "<eos>"
@@ -39,6 +40,7 @@ class VQADataset(Dataset):
         self.vocab = dict(zip(self.vocab, np.arange(len(self.vocab))))
         self.ds_path = ds_path
         self.phase = phase
+
 
     def __len__(self):
         return len(self.vqa.dataset)
@@ -83,16 +85,20 @@ class VQADataset(Dataset):
         return img_tensor, torch.tensor(q_vec, dtype=torch.int), torch.tensor(a_vec, dtype=torch.int), image_id
 
 class VQA_mm_Dataset(VQADataset):
-    def __init__(self, ds_path, phase, tokenize=True, include_imageid=False, include_q_vector=True, load_ocr=None, use_all_ans=True):
+    def __init__(self, ds_path, phase, tokenize=True, include_imageid=False, include_q_vector=True, load_ocr=None, use_all_ans=True, subset=False):
         super().__init__(ds_path, phase, use_all_ans=use_all_ans)
         self.model, self.preprocess = clip.load("ViT-B/32", device="cuda")
         self.include_q_vector = include_q_vector
         self.ans_types = {
-            'unanswerable': torch.tensor([0]),
-            'yes/no': torch.tensor([1]),
-            'number': torch.tensor([2]),
-            'other': torch.tensor([3])
+            'unanswerable': torch.tensor(0),
+            'yes/no': torch.tensor(1),
+            'number': torch.tensor(2),
+            'other': torch.tensor(3)
         }
+
+        if subset:
+            N = int(0.1 * len(self.vqa.dataset))
+            self.vqa.dataset = random.sample(self.vqa.dataset, N)
 
     def __getitem__(self, idx):
         '''Return images, questions, and answers
@@ -226,7 +232,7 @@ def collate_fn_pad_mm(batch):
     image_ids = [t[4] for t in batch]
 
     anstype_list = [t[-1] for t in batch]
-    anstypes = torch.stack(anstype_list, dim=0)
+    anstypes = torch.tensor(anstype_list)
     
     # clip tokenized
     question_list = [t[1] for t in batch]
