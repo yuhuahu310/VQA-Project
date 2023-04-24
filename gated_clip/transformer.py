@@ -54,6 +54,7 @@ class TransformerDecoder(nn.Module):
         super().__init__()
         
         vocab_size = len(word_to_idx)
+        self.vocab_size = vocab_size
         print("vocab_size: ", vocab_size)
         self._null = word_to_idx[PAD_TOKEN]
         self._start = word_to_idx.get(SOS_TOKEN, None)
@@ -125,7 +126,6 @@ class TransformerDecoder(nn.Module):
     
     def forward_answer_type(self, features, questions, answers):
         features_embed, _ = self.get_data_embeddings(features, questions, answers)
-
         answer_type = self.answer_type_head(features_embed.squeeze(1))
         return answer_type
 
@@ -153,7 +153,7 @@ class TransformerDecoder(nn.Module):
             N = features.shape[0]
 
             
-            predicted_answer_type_logits = self.forward_answer_type(features, questions, partial_caption)
+            predicted_answer_type_logits = self.forward_answer_type(features, questions, torch.ones(N, device=self.device).to(torch.long).unsqueeze(1))
             predicted_answer_type = torch.argmax(predicted_answer_type_logits, dim=-1)
             answer_type_mask = predicted_answer_type != 0
             n = answer_type_mask.sum()
@@ -167,15 +167,15 @@ class TransformerDecoder(nn.Module):
             partial_caption = torch.LongTensor(partial_caption).to(self.device)
             # [n] -> [n, 1]
             partial_caption = partial_caption.unsqueeze(1)
-            logits = torch.ones((n, max_length, 14788), device=self.device).float()
+            logits = torch.ones((n, max_length, self.vocab_size), device=self.device).float()
 
             features = features[answer_type_mask, :]
-            questions = questions[answer_type_mask, :, :]
+            questions = questions[answer_type_mask, :]
 
             for t in range(max_length):
 
                 # Predict the next token (ignoring all other time steps).
-                output_logits = self.forward(features, questions, partial_caption)
+                output_logits, _ = self.forward(features, questions, partial_caption)
                 output_logits = output_logits[:, -1, :]
                 logits[:, t, :] = output_logits
 
@@ -188,19 +188,19 @@ class TransformerDecoder(nn.Module):
                 word = word.unsqueeze(1)
                 partial_caption = torch.cat([partial_caption, word], dim=1)
             
-            final_captions = self._null * np.ones((n, max_length), dtype=np.int32)
-            final_captions[answer_type_mask, :] = captions
-            unanswerable_answers = torch.tensor([self._start, self._unanswerable, self._end] + [self._null] * (max_length - 3), 
-                                                device=captions.device, dtype=captions.dtype)
-            final_captions[~answer_type_mask, :] = unanswerable_answers
-
-            final_logits = torch.ones((N, max_length, 14788), device=self.device).float()
+            final_captions = self._null * np.ones((N, max_length), dtype=np.int32)
+            final_captions[answer_type_mask.cpu().numpy(), :] = captions
+            unanswerable_answers = np.array([self._start, self._unanswerable, self._end] + [self._null] * (max_length - 3), 
+                                                dtype=np.int32)
+            final_captions[~answer_type_mask.cpu().numpy(), :] = unanswerable_answers
+            final_logits = torch.ones((N, max_length, self.vocab_size), device=self.device).float()
             final_logits[answer_type_mask, :] = logits
-            unanswerable_logits = torch.zeros((1, max_length, 14788))
-            tmp = F.one_hot(torch.tensor([self._unanswerable, self._null, self._end], device=self.device), 14788, device=self.device)
+            unanswerable_logits = torch.zeros((1, max_length, self.vocab_size), device=self.device)
+            tmp = F.one_hot(torch.tensor([self._unanswerable, self._null, self._end], device=self.device), self.vocab_size)
             unanswerable_logits[:, 0, :] = tmp[0]
             unanswerable_logits[:, 1, :] = tmp[2]
             unanswerable_logits[:, 2:, :] = tmp[1]
+            import pdb; pdb.set_trace()
             final_logits[~answer_type_mask, :] = unanswerable_logits
 
             # caption (N, 8), logits (N, vocab_size), answer_type_logits (N, 4)

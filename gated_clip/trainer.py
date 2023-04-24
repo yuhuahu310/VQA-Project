@@ -10,7 +10,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 class Trainer(object):
 
-    def __init__(self, model, train_dataloader, val_dataloader, word_to_idx, idx_to_word, learning_rate = 0.001, num_epochs = 10, print_every = 1, verbose = True, device = 'cuda'):
+    def __init__(self, model, train_dataloader, val_dataloader, word_to_idx, idx_to_word, learning_rate = 0.001, num_epochs = 10, print_every = 5, verbose = True, device = 'cuda'):
       
         self.model = model
         self.train_dataloader = train_dataloader
@@ -115,6 +115,5 @@ class Trainer(object):
             #     np.save(f, self.loss_history)
             # with open('val_loss.npy', 'wb') as f:
             #     np.save(f, self.val_loss_history)
-
             # if (i +1) % self.print_every == 0:
             #     torch.save(self.model.state_dict(), "/home/yizhi/VQA-Project/unimodal_baseline/vision/model_%d.pth" % i)
