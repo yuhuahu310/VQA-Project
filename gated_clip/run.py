@@ -22,8 +22,8 @@ OOV_TOKEN = "<oov>"
 set_all_seeds(42)
 exp_name = 'case1'
 
-train_dataset = VQA_mm_Dataset("../data", "train")
-qa_dataset_val = VQA_mm_Dataset("../data", "val")
+train_dataset = VQA_mm_Dataset("../../../../net/projects/ranalab/kh310/vqa", "train", subset=True)
+qa_dataset_val = VQA_mm_Dataset("../../../../net/projects/ranalab/kh310/vqa", "val", subset=True)
 
 VOCAB_SIZE = len(train_dataset.vocab)
 ENC_EMB_DIM = 1000
@@ -36,8 +36,8 @@ BATCH_SIZE = 128
 NUM_EPOCH = 100
 
 
-train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, collate_fn=collate_fn_pad_mm, num_workers=32)
-val_dataloader = DataLoader(qa_dataset_val, batch_size=BATCH_SIZE, shuffle=False, collate_fn=collate_fn_pad_mm, num_workers=32)
+train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, collate_fn=collate_fn_pad_mm, num_workers=20)
+val_dataloader = DataLoader(qa_dataset_val, batch_size=BATCH_SIZE, shuffle=False, collate_fn=collate_fn_pad_mm, num_workers=20)
 
 device = 'cuda'
 transformer = TransformerDecoder(
@@ -61,19 +61,19 @@ trainer = Trainer(transformer, train_dataloader, val_dataloader,
 
 trainer.train()
 
-torch.save(transformer.state_dict(), "/home/yizhi/VQA-Project/gated_clip/model.pth")
+# torch.save(transformer.state_dict(), "/home/yizhi/VQA-Project/gated_clip/model.pth")
 
 # transformer.load_state_dict(torch.load("/home/yizhi/VQA-Project/multimodal_baseline/vision/model_99.pth"))
 # transformer.eval()
 
 
-# Plot the training losses.
-plt.plot(trainer.loss_history)
-plt.xlabel('Iteration')
-plt.ylabel('Loss')
-os.makedirs('plots', exist_ok=True)
-plt.title('Training loss history')
-plt.savefig('plots/' + exp_name + '_loss_out.png')
+# # Plot the training losses.
+# plt.plot(trainer.loss_history)
+# plt.xlabel('Iteration')
+# plt.ylabel('Loss')
+# os.makedirs('plots', exist_ok=True)
+# plt.title('Training loss history')
+# plt.savefig('plots/' + exp_name + '_loss_out.png')
 
 
 

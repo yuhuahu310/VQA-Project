@@ -94,4 +94,3 @@ class VQA:
 		word_list = np.array(word_list)
 		word_list = np.unique(word_list)
 		return word_list
-		

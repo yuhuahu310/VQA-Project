@@ -52,7 +52,7 @@ class TransformerDecoder(nn.Module):
         - max_length: Max possible sequence length.
         """
         super().__init__()
-
+        
         vocab_size = len(word_to_idx)
         print("vocab_size: ", vocab_size)
         self._null = word_to_idx[PAD_TOKEN]
@@ -83,11 +83,12 @@ class TransformerDecoder(nn.Module):
         self.to(device)
 
     def get_data_embeddings(self, features, questions, answers):
-        image_features = self.model.float().encode_image(features)
+        with torch.no_grad():
+            image_features = self.model.float().encode_image(features)
+            # freeze language model
+            questions_embedding = self.model.float().encode_text(questions)
         image_features = self.image_linear(image_features.float())
 
-        # freeze language model
-        questions_embedding = self.model.float().encode_text(questions)
         
         questions_embedding = self.encoder(questions_embedding)
         questions_embedding = self.text_linear(questions_embedding)
@@ -110,10 +111,7 @@ class TransformerDecoder(nn.Module):
         features_embed, captions_embed = self.get_data_embeddings(features, questions, answers)
 
         # Only compute answer type while training
-        if self.eval == False:
-            answer_type = self.answer_type_head(features_embed)
-        else:
-            answer_type = torch.zeros((features_embed.shape[0], 4), device=features.device)
+        answer_type = self.answer_type_head(features_embed.squeeze(1))
 
         mask = self.generate_square_subsequent_mask(captions_embed.shape[1])
         mask.to(captions_embed.dtype)
@@ -128,7 +126,7 @@ class TransformerDecoder(nn.Module):
     def forward_answer_type(self, features, questions, answers):
         features_embed, _ = self.get_data_embeddings(features, questions, answers)
 
-        answer_type = self.answer_type_head(features_embed)
+        answer_type = self.answer_type_head(features_embed.squeeze(1))
         return answer_type
 
     def _init_weights(self, module):
@@ -169,7 +167,7 @@ class TransformerDecoder(nn.Module):
             partial_caption = torch.LongTensor(partial_caption).to(self.device)
             # [n] -> [n, 1]
             partial_caption = partial_caption.unsqueeze(1)
-            logits = torch.ones((n, max_length, 16604), device=self.device).float()
+            logits = torch.ones((n, max_length, 14788), device=self.device).float()
 
             features = features[answer_type_mask, :]
             questions = questions[answer_type_mask, :, :]
@@ -196,10 +194,10 @@ class TransformerDecoder(nn.Module):
                                                 device=captions.device, dtype=captions.dtype)
             final_captions[~answer_type_mask, :] = unanswerable_answers
 
-            final_logits = torch.ones((N, max_length, 16604), device=self.device).float()
+            final_logits = torch.ones((N, max_length, 14788), device=self.device).float()
             final_logits[answer_type_mask, :] = logits
-            unanswerable_logits = torch.zeros((1, max_length, 16604))
-            tmp = F.one_hot(torch.tensor([self._unanswerable, self._null, self._end], device=self.device), 16604, device=self.device)
+            unanswerable_logits = torch.zeros((1, max_length, 14788))
+            tmp = F.one_hot(torch.tensor([self._unanswerable, self._null, self._end], device=self.device), 14788, device=self.device)
             unanswerable_logits[:, 0, :] = tmp[0]
             unanswerable_logits[:, 1, :] = tmp[2]
             unanswerable_logits[:, 2:, :] = tmp[1]

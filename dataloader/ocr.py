@@ -120,15 +120,20 @@ if __name__ == '__main__':
 
     with open(args.bboxes, 'r') as f:
         all_bboxes = json.load(f)
-    
+
+    all_bboxes_list = list(all_bboxes.items())
+    start = 0
+    all_bboxes_list = all_bboxes_list[start:]
     ocr = SceneTextRecognizer(model='alibaba-base')
     all_detected_texts = {}
-    for image_name, bboxes in tqdm(list(all_bboxes.items())):
+
+    # for image_name, bboxes in tqdm(list(all_bboxes.items())):
+    for image_name, bboxes in tqdm(all_bboxes_list):
         if len(bboxes) == 0: continue
         cropped_patches = crop_patches(f'{args.imgdir}/{image_name}', bboxes)
         texts = ocr.recognize(cropped_patches)
         print(image_name, texts)
         all_detected_texts[image_name] = texts
-    
-    with open(args.out, 'w') as f:
-        json.dump(all_detected_texts, f, indent=2)
+
+        with open(args.out, 'w') as f:
+            json.dump(all_detected_texts, f, indent=2)
