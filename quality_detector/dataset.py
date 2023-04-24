@@ -8,13 +8,14 @@ from tqdm import tqdm
 from pathlib import Path
 
 class QDDataset(Dataset):
-    def __init__(self, ds_path, phase):
+    def __init__(self, ds_path, phase, clf=True):
         '''
         :param ds_path: path to directory that contains Annotations, train, val, test
         :param phase: train, val, or test
         '''
         self.ds_path = ds_path
         self.phase = phase
+        self.clf = clf
         self.transform = transforms.Compose([
             transforms.Resize((224, 224)),
             transforms.ToTensor(),
@@ -29,7 +30,7 @@ class QDDataset(Dataset):
             self.dataset = dataset
         if False: # Change to False if already have transformed data
             self.preprocess()
-        print('Preprocessing done.')
+            print('Preprocessing done.')
 
     def __len__(self):
         return len(self.dataset)
@@ -41,7 +42,10 @@ class QDDataset(Dataset):
         flaws_dict = self.dataset[idx]['flaws']
         flaws = []
         for k in sorted(flaws_dict):
-            flaws.append(flaws_dict[k])
+            if self.clf:
+                flaws.append(1 if flaws_dict[k] > 0 else 0)
+            else:
+                flaws.append(flaws_dict[k])
 
         # Get image and convert to tensor
         img_fpath = os.path.join(self.ds_path, 'Transformed', self.phase, image_id) + '.pt'

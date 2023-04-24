@@ -7,6 +7,11 @@ import cv2
 import argparse
 import json
 from tqdm import tqdm
+import torch
+import gc
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+print('Using device:', device)
 
 
 def crop_patches(image_path, bounding_boxes, y_tolerance_ratio=0.9):
@@ -67,31 +72,40 @@ class SceneTextRecognizer:
         self.model_name = model
         if model == 'alibaba-base':
             self.processor = MgpstrProcessor.from_pretrained('alibaba-damo/mgp-str-base')
-            self.model = MgpstrForSceneTextRecognition.from_pretrained('alibaba-damo/mgp-str-base')
+            self.model = MgpstrForSceneTextRecognition.from_pretrained('alibaba-damo/mgp-str-base').to(device)
         elif model == 'ms-base':
             self.processor = TrOCRProcessor.from_pretrained('microsoft/trocr-base-str')
-            self.model = VisionEncoderDecoderModel.from_pretrained('microsoft/trocr-base-str')
+            self.model = VisionEncoderDecoderModel.from_pretrained('microsoft/trocr-base-str').to(device)
         elif model == 'ms-large':
             self.processor = TrOCRProcessor.from_pretrained('microsoft/trocr-large-str')
-            self.model = VisionEncoderDecoderModel.from_pretrained('microsoft/trocr-large-str')
+            self.model = VisionEncoderDecoderModel.from_pretrained('microsoft/trocr-large-str').to(device)
         else:
             raise ValueError('unsupported model:', model)
         
+    def recognize(self, patches, batch_size):
+        results = []
+        for batch_start in range(0, len(patches), batch_size):
+            batch_end = batch_start + batch_size
+            batch = patches[batch_start:batch_end]
 
-    def recognize(self, patches):
-        # load image from the IIIT-5k dataset
-        # url = "https://i.postimg.cc/ZKwLg2Gw/367-14.png"
-        # image = Image.open(requests.get(url, stream=True).raw).convert("RGB")
-        # image = Image.open("../ocr/test_patches/test2.png").convert("RGB")
-        if self.model_name.startswith('alibaba'):
-            pixel_values = self.processor(images=patches, return_tensors="pt").pixel_values
-            outputs = self.model(pixel_values)
-            return self.processor.batch_decode(outputs.logits)['generated_text']
-        else:
-            assert self.model_name.startswith('ms')
-            pixel_values = self.processor(images=patches, return_tensors="pt").pixel_values
-            generated_ids = self.model.generate(pixel_values)
-            return self.processor.batch_decode(generated_ids, skip_special_tokens=True)
+            if self.model_name.startswith('alibaba'):
+                pixel_values = self.processor(images=batch, return_tensors="pt").pixel_values.to(device)
+                outputs = self.model(pixel_values)
+                batch_results = self.processor.batch_decode(outputs.logits)['generated_text']
+
+                # garbage collect otherwise will OOM (this evil huggingface class has memory leak!)
+                del outputs
+                gc.collect()
+                torch.cuda.empty_cache()
+            else:
+                assert self.model_name.startswith('ms')
+                pixel_values = self.processor(images=batch, return_tensors="pt").pixel_values.to(device)
+                generated_ids = self.model.generate(pixel_values)
+                batch_results = self.processor.batch_decode(generated_ids, skip_special_tokens=True)
+
+            results.extend(batch_results)
+
+        return results
 
 
 def example_run():
@@ -116,17 +130,20 @@ if __name__ == '__main__':
     parser.add_argument('--bboxes', type=str, help='file path to bboxes json')
     parser.add_argument('--imgdir', type=str, help='dir path to images')
     parser.add_argument('--out', type=str, help='file path to write detected texts to')
+    parser.add_argument('--batchsize', type=int, default=16, help='batch size of recognition inference')
+    parser.add_argument('--model', type=str, choices=['alibaba-base', 'ms-base', 'ms-large'], default='alibaba-base', help='recognition model to use')
     args = parser.parse_args()
 
     with open(args.bboxes, 'r') as f:
         all_bboxes = json.load(f)
     
-    ocr = SceneTextRecognizer(model='alibaba-base')
+    print(f'using model: {args.model} with batch size {args.batchsize}')
+    ocr = SceneTextRecognizer(model=args.model)
     all_detected_texts = {}
     for image_name, bboxes in tqdm(list(all_bboxes.items())):
         if len(bboxes) == 0: continue
         cropped_patches = crop_patches(f'{args.imgdir}/{image_name}', bboxes)
-        texts = ocr.recognize(cropped_patches)
+        texts = ocr.recognize(cropped_patches, batch_size=args.batchsize)
         print(image_name, texts)
         all_detected_texts[image_name] = texts
     
