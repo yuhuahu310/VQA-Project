@@ -1,1 +1,1 @@
-python ocr.py --bboxes=ocr_results/bboxes_train.json --imgdir=../data/Images/train --out=ocr_results/ocr_texts_train.json
+python ocr.py --bboxes=ocr_results/bboxes_train.json --imgdir=../data/Images/train --out=ocr_results/ocr_texts_train.json --model=alibaba-base --batchsize="$1"
