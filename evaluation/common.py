@@ -26,5 +26,6 @@ def _remove_unused_tokens(s):
 
 def process_answer(s):
     s = s.replace(' <eos>', '')
+    s = s.replace('<sos> ', '')
     s = _remove_unused_tokens(s)
     return s
