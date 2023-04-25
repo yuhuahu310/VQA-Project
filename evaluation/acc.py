@@ -19,8 +19,12 @@ def get_accuracy(path):
     acc_total = 0
     acc_dict = defaultdict(float)
     type_count = defaultdict(int)
+    image_ids = set()
     for i in range(n):
         d = data['data'][i]
+        if d['image_id'] in image_ids:
+            continue
+        image_ids.add(d['image_id'])
         ann = annotation[d['image_id'] + '.jpg']
         assert d['image_id'] + '.jpg' == ann['image']
         ans_type = ann['answer_type']
@@ -34,7 +38,7 @@ def get_accuracy(path):
         acc_total += acc
         acc_dict[ans_type] += acc
         type_count[ans_type] += 1
-    acc_total /= n
+    acc_total /= len(image_ids)
     for ans_type in acc_dict:
         acc_dict[ans_type] /= type_count[ans_type]
     print('Model name: {}\n\tMode: {}\n\tOverall accuracy: {:.4f}'.format(model_name, mode, acc_total))
