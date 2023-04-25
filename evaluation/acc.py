@@ -44,7 +44,7 @@ def get_accuracy(path):
     acc_total /= len(image_ids)
     for ans_type in acc_dict:
         acc_dict[ans_type] /= type_count[ans_type]
-    unans_precision = type_count['unanswerable'] / unans_total if unans_total else float('nan')
+    unans_precision = min(type_count['unanswerable'] / unans_total, 1) if unans_total else float('nan')
     print('Model name: {}\n\tMode: {}\n\tOverall accuracy: {:.4f}'.format(model_name, mode, acc_total))
     print('\tAccuracy by answer type: '+', '.join([k + ': ' + f'{v:.4f}' for k, v in acc_dict.items()]))
     print(f'\tPrecision of unanswerable: {unans_precision:.4f}')
