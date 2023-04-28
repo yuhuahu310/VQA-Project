@@ -13,16 +13,19 @@ from torch.nn import functional as F
 import json
 import pytesseract
 import random
+from nltk.corpus import words
+from tqdm import tqdm
 
 SOS_TOKEN = "<sos>"
 EOS_TOKEN = "<eos>"
 PAD_TOKEN = "<pad>"
 OOV_TOKEN = "<oov>"
-OCR_TOKEN = "<ocr>"
+OCR_TOKEN = "ocr"
+CUSTOM_TOKENS = [SOS_TOKEN, EOS_TOKEN, PAD_TOKEN, OOV_TOKEN, OCR_TOKEN]
 
 # TODO: add padding and field to tackle sos/eos
 class VQADataset(Dataset):
-    def __init__(self, ds_path, phase, use_all_ans=True):
+    def __init__(self, ds_path, phase, use_all_ans=True, additional_vocab=[]):
         '''
 
         :param ds_path: path to directory that contains Annotations, train, val, test
@@ -31,10 +34,10 @@ class VQADataset(Dataset):
         self.vqa = VQA(annotation_file=os.path.join(ds_path, 'Annotations', f'{phase}.json'), use_all_ans=use_all_ans)
         # Get vocabulary using training data
         if phase == 'train':
-            self.vocab = np.concatenate(([SOS_TOKEN, EOS_TOKEN, PAD_TOKEN, OOV_TOKEN], self.vqa.get_vocab()))
+            self.vocab = list(self.vqa.get_vocab()) + additional_vocab
         else:
-            self.vocab = np.concatenate(([SOS_TOKEN, EOS_TOKEN, PAD_TOKEN, OOV_TOKEN], VQA(annotation_file=os.path.join(ds_path, 'Annotations/train.json')).get_vocab()))
-        # import pdb;pdb.set_trace()
+            self.vocab = list(VQA(annotation_file=os.path.join(ds_path, 'Annotations/train.json')).get_vocab()) + additional_vocab
+        self.vocab = CUSTOM_TOKENS + list(np.unique(self.vocab))
         self.vocab_size = len(self.vocab)
         self.reverse_vocab = dict(list(enumerate(self.vocab)))
         self.vocab = dict(zip(self.vocab, np.arange(len(self.vocab))))
@@ -47,7 +50,9 @@ class VQADataset(Dataset):
     
     def _sent_2_idx_seq(self, sent):
         tokenizer = RegexpTokenizer(r'\w+')
-        vec = [self.vocab[SOS_TOKEN]] + [self.vocab[word] if word in self.vocab else self.vocab[OOV_TOKEN] for word in tokenizer.tokenize(sent)] + [self.vocab[EOS_TOKEN]]
+        vec = [self.vocab[SOS_TOKEN]] + \
+                [self.vocab[word] if (word in self.vocab or word == OCR_TOKEN) else self.vocab[OOV_TOKEN] for word in tokenizer.tokenize(sent)] + \
+                [self.vocab[EOS_TOKEN]]
         return vec
     
     def idx_seq_2_sent(self, seq, to_str=True):
@@ -85,8 +90,8 @@ class VQADataset(Dataset):
         return img_tensor, torch.tensor(q_vec, dtype=torch.int), torch.tensor(a_vec, dtype=torch.int), image_id
 
 class VQA_mm_Dataset(VQADataset):
-    def __init__(self, ds_path, phase, tokenize=True, include_imageid=False, include_q_vector=True, load_ocr=None, use_all_ans=True, subset=False):
-        super().__init__(ds_path, phase, use_all_ans=use_all_ans)
+    def __init__(self, ds_path, phase, include_q_vector=True, load_ocr=None, use_all_ans=True, subset=False):
+        
         self.model, self.preprocess = clip.load("ViT-B/32", device="cuda")
         self.include_q_vector = include_q_vector
         self.ans_types = {
@@ -95,10 +100,45 @@ class VQA_mm_Dataset(VQADataset):
             'number': torch.tensor(2),
             'other': torch.tensor(3)
         }
+        
+        ocr_vocab = []
+        self.ocr_path = load_ocr
+        if load_ocr is not None:
+            self.ocr_results, ocr_vocab = self._load_ocr_results(load_ocr)
+
+        super().__init__(ds_path, phase, use_all_ans=use_all_ans, additional_vocab=ocr_vocab)
 
         if subset:
             N = int(0.1 * len(self.vqa.dataset))
             self.vqa.dataset = random.sample(self.vqa.dataset, N)
+
+    @staticmethod
+    def _preprocess_ocr_results(ocr_path):
+        with open(ocr_path, 'r') as f:
+            ocr_results = json.load(f) # {image_filename: List[ocr tokens]}
+        import enchant
+        d = enchant.Dict("en_US")
+        from nltk.corpus import stopwords
+        stop_words = set(stopwords.words('english'))
+        for image_id, ocr_words in tqdm(ocr_results.items()):
+            ocr_results[image_id] = [word for word in ocr_words if word != '' and (len(word)>1 or word.isdigit()) and d.check(word) and word not in stop_words]
+            
+        ocr_results_new = {image_id: words for image_id, words in ocr_results.items() if len(words)>0}
+
+        ocr_path_stem = ocr_path.replace(".json", "")
+        with open(f"{ocr_path_stem}_words_only.json", 'w') as f:
+            json.dump(ocr_results_new, f, indent=2)
+        return ocr_results_new
+
+    @staticmethod
+    def _load_ocr_results(ocr_path):
+        additional_vocab = set()
+        with open(ocr_path, 'r') as f:
+            ocr_results = json.load(f) # {image_filename: List[ocr tokens]}
+        for _, ocr_words in ocr_results.items():
+            additional_vocab.update(ocr_words)
+        return ocr_results, list(additional_vocab)
+
 
     def __getitem__(self, idx):
         '''Return images, questions, and answers
@@ -114,25 +154,24 @@ class VQA_mm_Dataset(VQADataset):
         # img_arr = io.imread(img_fpath)
         image = Image.open(img_fpath).convert("RGB")
         img_tensor = self.preprocess(image)
+        
+        ocr = ""
+        if self.ocr_path is not None and image_id in self.ocr_results:
+            ocr = self.ocr_results[image_id]
+            ocr = ' ' + OCR_TOKEN + ' ' + ' '.join(ocr)
+        # <sos> questions <ocr> ocr texts <eos>
 
-        # if self.load_ocr:
-        #     with open(self.load_ocr) as ocr_dict:
-        #         ocr = json.load(ocr_dict)[str(image_id)]
-        # else:
-        #     ocr = pytesseract.image_to_string(image)
-        # ocr = OCR_TOKEN + ocr
         # Convert answers and questions to index sequence
         flat_answers = [i['answer'] for i in answers]
         # In case of a tie, pick the first. Might consider pick randomly
         answer = max(flat_answers, key=flat_answers.count)
         a_vec = self._sent_2_idx_seq(answer)
 
-        question = clip.tokenize(question).squeeze(0)
+        question = clip.tokenize(question + ocr).squeeze(0)
         answer = clip.tokenize(answer).squeeze(0)
         # ocr_tokenized = clip.tokenize(ocr).squeeze(0)
-
         if self.include_q_vector:
-            q_vec = self._sent_2_idx_seq(qa_pair['question'])
+            q_vec = self._sent_2_idx_seq(qa_pair['question'] + ocr)
             # ocr_vec = self._sent_2_idx_seq(ocr) 
             return img_tensor, question, answer, torch.tensor(a_vec, dtype=torch.int), image_id, torch.tensor(q_vec, dtype=torch.int), ans_type
 
@@ -256,6 +295,12 @@ def collate_fn_pad_mm2(batch):
 
 
 if __name__ == '__main__':
-    vqa_dataset = VQA_mm_Dataset("../data", "train")
+    # for phase in ['train', 'val']:
+    #     path = f'ocr_results/ocr_texts_{phase}.json'
+    #     VQA_mm_Dataset.preprocess_ocr_results(path)
+
+    vqa_dataset = VQA_mm_Dataset("../data", "train", load_ocr='ocr_results/ocr_texts_train_words_only.json')
+    # vqa_dataset = VQA_mm_Dataset("../data", "train")
+    # breakpoint()
     print(f'len of dataset is {len(vqa_dataset)}')
-    print(vqa_dataset.getQA(0))
+    print(vqa_dataset[0])
