@@ -9,18 +9,11 @@ import random
 import torch
 import clip
 from PIL import Image
+import sys
+sys.path.insert(0, '../dataloader')
+from dataset import SOS_TOKEN, EOS_TOKEN, PAD_TOKEN, OOV_TOKEN, OCR_TOKEN
+from contextlib import nullcontext
 
-
-SOS_TOKEN = "<sos>"
-EOS_TOKEN = "<eos>"
-PAD_TOKEN = "<pad>"
-OOV_TOKEN = "<oov>"
-def set_all_seeds(seed):
-  random.seed(seed)
-  np.random.seed(seed)
-  torch.manual_seed(seed)
-  torch.cuda.manual_seed(seed)
-  torch.backends.cudnn.deterministic = True
 
 class PositionalEncoding(nn.Module):
     def __init__(self, embed_dim, dropout=0.1, max_len=5000):
@@ -83,8 +76,8 @@ class TransformerDecoder(nn.Module):
         self.device = device 
         self.to(device)
 
-    def get_data_embeddings(self, features, questions, answers):
-        with torch.no_grad():
+    def get_data_embeddings(self, features, questions, answers, freeze_encoders=True):
+        with torch.no_grad() if freeze_encoders else nullcontext():
             image_features = self.model.float().encode_image(features)
             # freeze language model
             questions_embedding = self.model.float().encode_text(questions)
@@ -108,8 +101,8 @@ class TransformerDecoder(nn.Module):
         mask = mask.masked_fill(mask == 0, 1).masked_fill(mask == 1, 0)
         return mask
                                       
-    def forward(self, features, questions, answers):
-        features_embed, captions_embed = self.get_data_embeddings(features, questions, answers)
+    def forward(self, features, questions, answers, freeze_encoders):
+        features_embed, captions_embed = self.get_data_embeddings(features, questions, answers, freeze_encoders=freeze_encoders)
 
         # Only compute answer type while training
         answer_type = self.answer_type_head(features_embed.squeeze(1))

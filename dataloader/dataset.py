@@ -37,7 +37,7 @@ class VQADataset(Dataset):
             self.vocab = list(self.vqa.get_vocab()) + additional_vocab
         else:
             self.vocab = list(VQA(annotation_file=os.path.join(ds_path, 'Annotations/train.json')).get_vocab()) + additional_vocab
-        self.vocab = CUSTOM_TOKENS + list(np.unique(self.vocab))
+        self.vocab = CUSTOM_TOKENS + sorted(list(np.unique(self.vocab)))
         self.vocab_size = len(self.vocab)
         self.reverse_vocab = dict(list(enumerate(self.vocab)))
         self.vocab = dict(zip(self.vocab, np.arange(len(self.vocab))))

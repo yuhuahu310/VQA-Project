@@ -475,3 +475,4 @@ unimodal_baseline/language/LSTM_ckpt/
 quality_detector/Annotations/
 quality_detector/ResNext_ckpt/
 ocr/
+gated_clip/runs/
