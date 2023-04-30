@@ -108,7 +108,7 @@ if __name__ == '__main__':
     parser.add_argument('--data_dir', type=str, default='../data', help='path to vqa data dir')
     parser.add_argument('--subset', action='store_true', default=False, help='use 0.1 subset of full dataset')
     parser.add_argument('--ocr_results_dir', type=str, default='../dataloader/ocr_results', help='path to ocr results json dir')
-    parser.add_argument('--fusion', type=str, default='mult', help='use mult or attn as fusion technique')
+    parser.add_argument('--fusion', type=str, default='mult', choices=['mult', 'cross_attn'], help='use mult or attn as fusion technique')
     parser.add_argument('--use_quality', action='store_true', default=False, help='use quality detector or not')
     parser.add_argument('--quality_model_path', type=str, default='../quality_detector/QD-epoch_19-trainloss_0.5231-valloss_0.8162.pth', help='path to quality detector model')
 
