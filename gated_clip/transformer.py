@@ -78,7 +78,7 @@ class TransformerDecoder(nn.Module):
         # multimodal fusion
         self.multihead_attn = nn.MultiheadAttention(embed_dim, num_heads)
 
-        assert fusion == 'mult' or fusion == 'attn'
+        assert fusion == 'mult' or fusion == 'cross_attn'
         self.fusion = fusion
 
         self.apply(self._init_weights)
