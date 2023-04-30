@@ -103,7 +103,7 @@ if __name__ == '__main__':
     current_time = datetime.now().strftime('%b%d_%H-%M-%S')
     parser.add_argument('--exp_name', type=str, default=current_time, help='experiment name')
     parser.add_argument('--eval', action='store_true', default=False, help='eval only')
-    parser.add_argument('--epochs', type=int, default=100, help='num epochs to train, not counting resumed epochs')
+    parser.add_argument('--epochs', type=int, default=50, help='num epochs to train, not counting resumed epochs')
     parser.add_argument('--batch_size', type=int, default=128, help='batch size')
     parser.add_argument('--data_dir', type=str, default='../data', help='path to vqa data dir')
     parser.add_argument('--subset', action='store_true', default=False, help='use 0.1 subset of full dataset')

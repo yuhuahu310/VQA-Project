@@ -129,6 +129,7 @@ class VQA_mm_Dataset(VQADataset):
     def _preprocess_ocr_results(ocr_path):
         with open(ocr_path, 'r') as f:
             ocr_results = json.load(f) # {image_filename: List[ocr tokens]}
+        f.close()
         import enchant
         d = enchant.Dict("en_US")
         from nltk.corpus import stopwords
@@ -142,6 +143,7 @@ class VQA_mm_Dataset(VQADataset):
         ocr_path_stem = ocr_path.replace(".json", "")
         with open(f"{ocr_path_stem}_words_only_no_dup.json", 'w') as f:
             json.dump(ocr_results_new, f, indent=2)
+        f.close()
         return ocr_results_new
 
     @staticmethod
@@ -149,6 +151,7 @@ class VQA_mm_Dataset(VQADataset):
         additional_vocab = set()
         with open(ocr_path, 'r') as f:
             ocr_results = json.load(f) # {image_filename: List[ocr tokens]}
+        f.close()
         for _, ocr_words in ocr_results.items():
             additional_vocab.update(ocr_words)
         return ocr_results, list(additional_vocab)
