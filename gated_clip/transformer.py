@@ -32,11 +32,7 @@ class PositionalEncoding(nn.Module):
 
 class TransformerDecoder(nn.Module):
     def __init__(self, word_to_idx, idx_to_word, input_dim, embed_dim, num_heads=4,
-<<<<<<< HEAD
-                 num_layers=2, max_length=50, device = 'cuda', fusion='mult'):
-=======
-                 num_layers=2, max_length=50, device = 'cuda', quality_detector=None):
->>>>>>> 440c705693c75e8e412513c197c56c6a4ebac330
+                 num_layers=2, max_length=50, device = 'cuda', fusion='mult', quality_detector=None):
         """
         Construct a new TransformerDecoder instance.
         Inputs:
@@ -72,14 +68,10 @@ class TransformerDecoder(nn.Module):
         self.image_linear = nn.Linear(512, embed_dim)
         self.text_linear = nn.Linear(512, embed_dim)
 
-<<<<<<< HEAD
         self.answer_type_head = nn.Sequential(
-            nn.Linear(embed_dim, 128),
+            nn.Linear(embed_dim + 8 if quality_detector else embed_dim, 128),
             nn.Linear(128, 4)
         )
-=======
-        self.answer_type_head = nn.Linear(embed_dim + 8 if quality_detector else embed_dim, 4)
->>>>>>> 440c705693c75e8e412513c197c56c6a4ebac330
 
         self.score_projection = nn.Linear(embed_dim, vocab_size)
 
