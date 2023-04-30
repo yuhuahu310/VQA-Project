@@ -90,7 +90,7 @@ class VQADataset(Dataset):
         return img_tensor, torch.tensor(q_vec, dtype=torch.int), torch.tensor(a_vec, dtype=torch.int), image_id
 
 class VQA_mm_Dataset(VQADataset):
-    def __init__(self, ds_path, phase, include_q_vector=True, load_ocr=None, use_all_ans=True, subset=False):
+    def __init__(self, ds_path, phase, include_q_vector=True, load_ocr=None, use_all_ans=True, subset=False, truncate_ocr=True, max_text_len=50):
         
         self.model, self.preprocess = clip.load("ViT-B/32", device="cuda")
         self.include_q_vector = include_q_vector
@@ -105,12 +105,25 @@ class VQA_mm_Dataset(VQADataset):
         self.ocr_path = load_ocr
         if load_ocr is not None:
             self.ocr_results, ocr_vocab = self._load_ocr_results(load_ocr)
+        self.truncate_ocr = truncate_ocr
+
+        self.max_text_len = max_text_len
 
         super().__init__(ds_path, phase, use_all_ans=use_all_ans, additional_vocab=ocr_vocab)
 
         if subset:
             N = int(0.1 * len(self.vqa.dataset))
             self.vqa.dataset = random.sample(self.vqa.dataset, N)
+            
+    # @staticmethod
+    # def _remove_dupe(original_list):
+    #     new_list = []
+    #     seen = set()
+    #     for item in original_list:
+    #         if item not in seen:
+    #             seen.add(item)
+    #             new_list.append(item)
+    #     return new_list
 
     @staticmethod
     def _preprocess_ocr_results(ocr_path):
@@ -122,11 +135,12 @@ class VQA_mm_Dataset(VQADataset):
         stop_words = set(stopwords.words('english'))
         for image_id, ocr_words in tqdm(ocr_results.items()):
             ocr_results[image_id] = [word for word in ocr_words if word != '' and (len(word)>1 or word.isdigit()) and d.check(word) and word not in stop_words]
-            
+            # ocr_results[image_id] = VQA_mm_Dataset._remove_dupe(ocr_results[image_id])
+
         ocr_results_new = {image_id: words for image_id, words in ocr_results.items() if len(words)>0}
 
         ocr_path_stem = ocr_path.replace(".json", "")
-        with open(f"{ocr_path_stem}_words_only.json", 'w') as f:
+        with open(f"{ocr_path_stem}_words_only_no_dup.json", 'w') as f:
             json.dump(ocr_results_new, f, indent=2)
         return ocr_results_new
 
@@ -158,6 +172,12 @@ class VQA_mm_Dataset(VQADataset):
         ocr = ""
         if self.ocr_path is not None and image_id in self.ocr_results:
             ocr = self.ocr_results[image_id]
+            if self.truncate_ocr:
+                q_len = clip.tokenize(question)[0].count_nonzero().item()
+                # print(clip.tokenize(question))
+                max_ocr_len = max(self.max_text_len - q_len - 1, 0)
+                # if max_ocr_len < len(ocr): print(max_ocr_len, len(ocr))
+                ocr = ocr[:max_ocr_len]
             ocr = ' ' + OCR_TOKEN + ' ' + ' '.join(ocr)
         # <sos> questions <ocr> ocr texts <eos>
 
@@ -297,10 +317,10 @@ def collate_fn_pad_mm2(batch):
 if __name__ == '__main__':
     # for phase in ['train', 'val']:
     #     path = f'ocr_results/ocr_texts_{phase}.json'
-    #     VQA_mm_Dataset.preprocess_ocr_results(path)
+    #     VQA_mm_Dataset._preprocess_ocr_results(path)
 
     vqa_dataset = VQA_mm_Dataset("../data", "train", load_ocr='ocr_results/ocr_texts_train_words_only.json')
     # vqa_dataset = VQA_mm_Dataset("../data", "train")
-    # breakpoint()
+    # # breakpoint()
     print(f'len of dataset is {len(vqa_dataset)}')
     print(vqa_dataset[0])

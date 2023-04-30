@@ -4,6 +4,7 @@ from qd_dataset import QDDataset
 from torch.utils.data import DataLoader
 import torch.optim as optim
 import os
+from torchvision import transforms
 
 # Set device to GPU if available, otherwise use CPU
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -14,6 +15,11 @@ class QualityDetector(nn.Module):
         self.clf = clf
         self.resnet = torch.hub.load('pytorch/vision:v0.10.0', resnet, pretrained=pretrained)
         self.fc = nn.Linear(1000, 8) # output dim of resnext = 1000
+        self.transform = transforms.Compose([
+            transforms.Resize((224, 224)),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        ])
 
     def forward(self, x):
         x = self.resnet(x)

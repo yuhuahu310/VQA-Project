@@ -32,7 +32,7 @@ class PositionalEncoding(nn.Module):
 
 class TransformerDecoder(nn.Module):
     def __init__(self, word_to_idx, idx_to_word, input_dim, embed_dim, num_heads=4,
-                 num_layers=2, max_length=50, device = 'cuda'):
+                 num_layers=2, max_length=50, device = 'cuda', quality_detector=None):
         """
         Construct a new TransformerDecoder instance.
         Inputs:
@@ -68,13 +68,14 @@ class TransformerDecoder(nn.Module):
         self.image_linear = nn.Linear(512, embed_dim)
         self.text_linear = nn.Linear(512, embed_dim)
 
-        self.answer_type_head = nn.Linear(embed_dim, 4)
+        self.answer_type_head = nn.Linear(embed_dim + 8 if quality_detector else embed_dim, 4)
 
         self.score_projection = nn.Linear(embed_dim, vocab_size) 
 
         self.apply(self._init_weights)
         self.device = device 
         self.to(device)
+        self.quality_detector = quality_detector
 
     def get_data_embeddings(self, features, questions, answers, freeze_encoders=True):
         with torch.no_grad() if freeze_encoders else nullcontext():
@@ -101,10 +102,14 @@ class TransformerDecoder(nn.Module):
         mask = mask.masked_fill(mask == 0, 1).masked_fill(mask == 1, 0)
         return mask
                                       
-    def forward(self, features, questions, answers, freeze_encoders):
+    def forward(self, features, questions, answers, freeze_encoders=True):
         features_embed, captions_embed = self.get_data_embeddings(features, questions, answers, freeze_encoders=freeze_encoders)
 
         # Only compute answer type while training
+        # if self.quality_detector:
+            # quality_vector = self.quality_detector(self.quality_detector.transform(features))
+            # answer_type = self.answer_type_head(torch.cat(quality_vector, features_embed.squeeze(1), dim=1))
+        # else:
         answer_type = self.answer_type_head(features_embed.squeeze(1))
 
         mask = self.generate_square_subsequent_mask(captions_embed.shape[1])
@@ -119,6 +124,10 @@ class TransformerDecoder(nn.Module):
     
     def forward_answer_type(self, features, questions, answers):
         features_embed, _ = self.get_data_embeddings(features, questions, answers)
+        # if self.quality_detector:
+            # quality_vector = self.quality_detector(self.quality_detector.transform(features))
+            # answer_type = self.answer_type_head(torch.cat(quality_vector, features_embed.squeeze(1), dim=1))
+        # else:
         answer_type = self.answer_type_head(features_embed.squeeze(1))
         return answer_type
 
