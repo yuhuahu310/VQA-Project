@@ -200,7 +200,6 @@ class TransformerDecoder(nn.Module):
             unanswerable_logits[:, 0, :] = tmp[0]
             unanswerable_logits[:, 1, :] = tmp[2]
             unanswerable_logits[:, 2:, :] = tmp[1]
-            import pdb; pdb.set_trace()
             final_logits[~answer_type_mask, :] = unanswerable_logits
 
             # caption (N, 8), logits (N, vocab_size), answer_type_logits (N, 4)
