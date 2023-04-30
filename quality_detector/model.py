@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from dataset import QDDataset
+from qd_dataset import QDDataset
 from torch.utils.data import DataLoader
 import torch.optim as optim
 import os
@@ -76,6 +76,11 @@ def save_model(model, epoch, save_dir, train_loss, val_loss, clf, model_name):
 def load_model(model, file_path):
     model.load_state_dict(torch.load(file_path))
     print(f"Model loaded from {file_path}")
+
+def load_new_model(file_path, resnet='resnext50_32x4d', clf=True, pretrained=True):
+    model = QualityDetector(clf, resnet, pretrained)
+    model.load_state_dict(torch.load(file_path))
+    return model
 
 if __name__ == "__main__":
     BIN_CLF = True # True if binary classification, False if regression

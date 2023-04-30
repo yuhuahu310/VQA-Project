@@ -12,7 +12,10 @@ from datetime import datetime
 import argparse
 import sys
 sys.path.insert(0, '../dataloader')
+sys.path.insert(0, '../quality_detector')
 from dataset import VQA_mm_Dataset, collate_fn_pad_mm, SOS_TOKEN, EOS_TOKEN, PAD_TOKEN, OOV_TOKEN, OCR_TOKEN
+from quality_detector import QualityDetector, load_new_model
+from qd_dataset import QDDataset
 
 import torch.multiprocessing
 torch.multiprocessing.set_sharing_strategy('file_system')
@@ -106,6 +109,9 @@ if __name__ == '__main__':
     parser.add_argument('--subset', action='store_true', default=False, help='use 0.1 subset of full dataset')
     parser.add_argument('--ocr_results_dir', type=str, default='../dataloader/ocr_results', help='path to ocr results json dir')
     parser.add_argument('--fusion', type=str, default='mult', help='use mult or attn as fusion technique')
+    parser.add_argument('--use_quality', action='store_true', default=False, help='use quality detector or not')
+    parser.add_argument('--quality_model_path', type=str, default='../quality_detector/QD-epoch_19-trainloss_0.5231-valloss_0.8162.pth', help='path to quality detector model')
+    
     args = parser.parse_args()
 
     if args.eval:
@@ -138,6 +144,10 @@ if __name__ == '__main__':
 
     device = 'cuda'
     exp_name = args.exp_name #'gated_clip_1'
+
+    quality_detector = None
+    if args.use_quality:
+        quality_detector = load_new_model(args.quality_model_path)
     
     transformer = TransformerDecoder(
             word_to_idx=train_dataset.vocab,
@@ -148,7 +158,11 @@ if __name__ == '__main__':
             num_layers=6,
             max_length=30,
             device = device,
+<<<<<<< HEAD
             fusion = args.fusion
+=======
+            quality_detector=quality_detector
+>>>>>>> 440c705693c75e8e412513c197c56c6a4ebac330
             )
 
     start_epoch = 0

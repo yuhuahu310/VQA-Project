@@ -6,7 +6,7 @@ import torchvision.models as models
 from torch.profiler import profile, record_function, ProfilerActivity
 import torch
 from torch.utils.tensorboard import SummaryWriter
-from transformers.optimization import AdamW
+from torch.optim import AdamW
 from tqdm import tqdm
 
 
