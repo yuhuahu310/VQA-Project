@@ -87,7 +87,8 @@ class TransformerDecoder(nn.Module):
         self.quality_detector = quality_detector
 
     def get_data_embeddings(self, features, questions, answers, freeze_encoders=True):
-        with torch.no_grad() if freeze_encoders else nullcontext():
+        # with torch.no_grad() if freeze_encoders else nullcontext():
+        with torch.set_grad_enabled(not freeze_encoders):
             image_features = self.model.float().encode_image(features)
             # freeze language model
             questions_embedding = self.model.float().encode_text(questions)

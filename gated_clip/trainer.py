@@ -116,12 +116,12 @@ class Trainer(object):
                     'lang-loss': val_loss_lang,
                     'type-loss': val_loss_type
                 }, i)
-                ckpt_dir = 'ckpt/'
+                ckpt_dir = 'ckpt'
                 os.makedirs(ckpt_dir, exist_ok=True)
                 torch.save({
                     'epoch': i,
                     'model': self.model.state_dict()
-                }, f"{ckpt_dir}/model_{self.exp_name}_epoch-{i}_trainloss-{train_loss_total}_valloss-{val_loss}.pth")
+                }, f"{ckpt_dir}/model_{self.exp_name}.pth")
 
             # with open('train_loss.npy', 'wb') as f:
             #     np.save(f, self.loss_history)
