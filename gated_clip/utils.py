@@ -1,6 +1,6 @@
 import sys
 sys.path.insert(0, '../dataloader')
-from dataset import QADataset, collate_fn_pad
+from dataset import QADataset, collate_fn_pad, SOS_TOKEN, EOS_TOKEN, PAD_TOKEN, OOV_TOKEN, OCR_TOKEN
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -10,10 +10,6 @@ import os
 import json
 import numpy as np
 
-SOS_TOKEN = "<sos>"
-EOS_TOKEN = "<eos>"
-PAD_TOKEN = "<pad>"
-OOV_TOKEN = "<oov>"
 
 def set_all_seeds(seed):
   random.seed(seed)
