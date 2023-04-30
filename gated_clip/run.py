@@ -105,6 +105,7 @@ if __name__ == '__main__':
     parser.add_argument('--data_dir', type=str, default='../data', help='path to vqa data dir')
     parser.add_argument('--subset', action='store_true', default=False, help='use 0.1 subset of full dataset')
     parser.add_argument('--ocr_results_dir', type=str, default='../dataloader/ocr_results', help='path to ocr results json dir')
+    parser.add_argument('--fusion', type=str, default='mult', help='use mult or attn as fusion technique')
     args = parser.parse_args()
 
     if args.eval:
@@ -146,11 +147,14 @@ if __name__ == '__main__':
             num_heads=4,
             num_layers=6,
             max_length=30,
-            device = device
+            device = device,
+            fusion = args.fusion
             )
 
+    start_epoch = 0
     if args.resume_ckpt != '':
-        transformer.load_state_dict(torch.load(args.resume_ckpt))
+        transformer.load_state_dict(torch.load(args.resume_ckpt)['model'])
+        start_epoch = torch.load(args.resume_ckpt)['epoch'] + 1
         print(f'resumed training from {args.resume_ckpt}')
     
     if not args.eval:
@@ -162,7 +166,9 @@ if __name__ == '__main__':
                 weight_decay=1e-2,
                 device = device,
                 freeze_encoders_until_epoch=args.freeze_encoders_until_epoch,
-                exp_name = exp_name
+                exp_name = exp_name,
+                start_epoch=start_epoch,
+                print_every=1
                 )
 
         trainer.train()
@@ -171,6 +177,7 @@ if __name__ == '__main__':
     #
     
     # transformer.load_state_dict(torch.load(f"./model_{exp_name}.pth"))
+    print("Start Evaluation")
     transformer.eval()
     #
     #

@@ -32,7 +32,7 @@ class PositionalEncoding(nn.Module):
 
 class TransformerDecoder(nn.Module):
     def __init__(self, word_to_idx, idx_to_word, input_dim, embed_dim, num_heads=4,
-                 num_layers=2, max_length=50, device = 'cuda'):
+                 num_layers=2, max_length=50, device = 'cuda', fusion='mult'):
         """
         Construct a new TransformerDecoder instance.
         Inputs:
@@ -68,9 +68,18 @@ class TransformerDecoder(nn.Module):
         self.image_linear = nn.Linear(512, embed_dim)
         self.text_linear = nn.Linear(512, embed_dim)
 
-        self.answer_type_head = nn.Linear(embed_dim, 4)
+        self.answer_type_head = nn.Sequential(
+            nn.Linear(embed_dim, 128),
+            nn.Linear(128, 4)
+        )
 
-        self.score_projection = nn.Linear(embed_dim, vocab_size) 
+        self.score_projection = nn.Linear(embed_dim, vocab_size)
+
+        # multimodal fusion
+        self.multihead_attn = nn.MultiheadAttention(embed_dim, num_heads)
+
+        assert fusion == 'mult' or fusion == 'attn'
+        self.fusion = fusion
 
         self.apply(self._init_weights)
         self.device = device 
@@ -91,8 +100,11 @@ class TransformerDecoder(nn.Module):
         answers_embedding = self.caption_embedding(answers)
         answers_embedding = self.positional_encoding(answers_embedding)
 
-        # Mutimodality Fusion
-        multi_feature = image_features * questions_embedding
+        # Multimodality Fusion
+        if self.fusion == 'mult':
+            multi_feature = image_features * questions_embedding
+        else: # attention
+            multi_feature, attn_output_weights = self.multihead_attn(query=questions_embedding, key=image_features, value=image_features)
         multi_feature = torch.unsqueeze(multi_feature, 1)
         return multi_feature, answers_embedding
 

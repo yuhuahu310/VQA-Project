@@ -15,7 +15,7 @@ class Trainer(object):
 
     def __init__(self, model, train_dataloader, val_dataloader, word_to_idx, idx_to_word, exp_name,
                     learning_rate = 1e-3, weight_decay=1e-2, num_epochs = 10, print_every = 5, verbose = True, device = 'cuda',
-                    freeze_encoders_until_epoch=-1):
+                    freeze_encoders_until_epoch=-1, start_epoch=0):
         self.model = model
         self.train_dataloader = train_dataloader
         self.val_dataloader = val_dataloader
@@ -32,6 +32,7 @@ class Trainer(object):
         self.exp_name = exp_name
         self.writer = SummaryWriter(log_dir=f'./runs/{self.exp_name}')
         self.freeze_encoders_until_epoch = freeze_encoders_until_epoch
+        self.start_epoch = start_epoch
 
     # answer_type: (B, 1)
     def loss(self, predictions, answers, answer_type):
@@ -72,7 +73,7 @@ class Trainer(object):
         """
         Run optimization to train the model.
         """
-        for i in range(self.num_epochs):
+        for i in range(self.start_epoch, self.num_epochs):
             epoch_loss = 0
             epoch_loss_lang = 0
             epoch_loss_type = 0
@@ -117,7 +118,10 @@ class Trainer(object):
                 }, i)
                 ckpt_dir = 'ckpt/'
                 os.makedirs(ckpt_dir, exist_ok=True)
-                torch.save(self.model.state_dict(), f"{ckpt_dir}/model_{self.exp_name}_epoch-{i}_trainloss-{train_loss_total}_valloss-{val_loss}.pth")
+                torch.save({
+                    'epoch': i,
+                    'model': self.model.state_dict()
+                }, f"{ckpt_dir}/model_{self.exp_name}_epoch-{i}_trainloss-{train_loss_total}_valloss-{val_loss}.pth")
 
             # with open('train_loss.npy', 'wb') as f:
             #     np.save(f, self.loss_history)
