@@ -15,7 +15,7 @@ sys.path.insert(0, '../dataloader')
 sys.path.insert(0, '../quality_detector')
 from dataset import VQA_mm_Dataset, collate_fn_pad_mm, SOS_TOKEN, EOS_TOKEN, PAD_TOKEN, OOV_TOKEN, OCR_TOKEN
 from quality_detector import QualityDetector, load_new_model
-from qd_dataset import QDDataset
+# from qd_dataset import QDDataset
 
 import torch.multiprocessing
 torch.multiprocessing.set_sharing_strategy('file_system')
@@ -110,7 +110,7 @@ if __name__ == '__main__':
     parser.add_argument('--ocr_results_dir', type=str, default='../dataloader/ocr_results', help='path to ocr results json dir')
     parser.add_argument('--fusion', type=str, default='mult', choices=['mult', 'cross_attn'], help='use mult or attn as fusion technique')
     parser.add_argument('--use_quality', action='store_true', default=False, help='use quality detector or not')
-    parser.add_argument('--quality_model_path', type=str, default='../quality_detector/QD-epoch_19-trainloss_0.5231-valloss_0.8162.pth', help='path to quality detector model')
+    parser.add_argument('--quality_model_path', type=str, default='../quality_detector/QD-resnext50_32x4d-bce-epoch_14-trainloss_0.3725-valloss_0.4276.pth', help='path to quality detector model')
 
     args = parser.parse_args()
 
@@ -147,7 +147,7 @@ if __name__ == '__main__':
 
     quality_detector = None
     if args.use_quality:
-        quality_detector = load_new_model(args.quality_model_path)
+        quality_detector = load_new_model(args.quality_model_path).to(device)
     
     transformer = TransformerDecoder(
             word_to_idx=train_dataset.vocab,
