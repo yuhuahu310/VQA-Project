@@ -55,7 +55,7 @@ class TransformerDecoder(nn.Module):
         self._end = word_to_idx[EOS_TOKEN]
         self.idx_to_word = idx_to_word
         
-        decoder_layer = nn.TransformerDecoderLayer(d_model=embed_dim, nhead=num_heads, batch_first=True, dropout=0.3)
+        decoder_layer = nn.TransformerDecoderLayer(d_model=embed_dim, nhead=num_heads, batch_first=True, dropout=0.2)
         self.layers = nn.ModuleList([decoder_layer for _ in range(num_layers)])
 
         encoder_layer = nn.TransformerEncoderLayer(d_model=512, nhead=num_heads, batch_first=True)
@@ -102,7 +102,7 @@ class TransformerDecoder(nn.Module):
         image_features = self.image_linear(image_features.float())
 
         
-        # questions_embedding = self.encoder(questions_embedding)
+        questions_embedding = self.encoder(questions_embedding)
         questions_embedding = self.text_linear(questions_embedding)
 
         
