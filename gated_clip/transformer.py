@@ -39,7 +39,7 @@ class PositionalEncoding(nn.Module):
 
 class TransformerDecoder(nn.Module):
     def __init__(self, word_to_idx, idx_to_word, input_dim, embed_dim, num_heads=4,
-                 num_layers=2, max_length=50, device = 'cuda'):
+                 num_layers=2, max_length=50, device = 'cuda', freeze_encoder = True):
         """
         Construct a new TransformerDecoder instance.
         Inputs:
@@ -77,16 +77,25 @@ class TransformerDecoder(nn.Module):
 
         self.answer_type_head = nn.Linear(embed_dim, 4)
 
-        self.score_projection = nn.Linear(embed_dim, vocab_size) 
+        self.score_projection = nn.Linear(embed_dim, vocab_size)
+
+        self.freeze_encoder = freeze_encoder
+
+        # multimodal fusion
+        self.multihead_attn = nn.MultiheadAttention(embed_dim, num_heads)
 
         self.apply(self._init_weights)
         self.device = device 
         self.to(device)
 
     def get_data_embeddings(self, features, questions, answers):
-        with torch.no_grad():
+        if self.freeze_encoder:
+            with torch.no_grad():
+                image_features = self.model.float().encode_image(features)
+                # freeze language model
+                questions_embedding = self.model.float().encode_text(questions)
+        else:
             image_features = self.model.float().encode_image(features)
-            # freeze language model
             questions_embedding = self.model.float().encode_text(questions)
         image_features = self.image_linear(image_features.float())
 
@@ -100,6 +109,8 @@ class TransformerDecoder(nn.Module):
 
         # Mutimodality Fusion
         multi_feature = image_features * questions_embedding
+        # multi_feature, attn_output_weights = self.multihead_attn(query=questions_embedding, key=image_features,
+        #                                                          value=image_features)
         multi_feature = torch.unsqueeze(multi_feature, 1)
         return multi_feature, answers_embedding
 
@@ -200,7 +211,6 @@ class TransformerDecoder(nn.Module):
             unanswerable_logits[:, 0, :] = tmp[0]
             unanswerable_logits[:, 1, :] = tmp[2]
             unanswerable_logits[:, 2:, :] = tmp[1]
-            import pdb; pdb.set_trace()
             final_logits[~answer_type_mask, :] = unanswerable_logits
 
             # caption (N, 8), logits (N, vocab_size), answer_type_logits (N, 4)

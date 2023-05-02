@@ -85,7 +85,7 @@ class VQADataset(Dataset):
         return img_tensor, torch.tensor(q_vec, dtype=torch.int), torch.tensor(a_vec, dtype=torch.int), image_id
 
 class VQA_mm_Dataset(VQADataset):
-    def __init__(self, ds_path, phase, tokenize=True, include_imageid=False, include_q_vector=True, load_ocr=None, use_all_ans=True, subset=False):
+    def __init__(self, ds_path, phase, tokenize=True, include_imageid=False, include_q_vector=True, load_ocr=None, use_all_ans=True, subset=False, truncate_ocr=True, max_text_len=50):
         super().__init__(ds_path, phase, use_all_ans=use_all_ans)
         self.model, self.preprocess = clip.load("ViT-B/32", device="cuda")
         self.include_q_vector = include_q_vector
@@ -96,9 +96,25 @@ class VQA_mm_Dataset(VQADataset):
             'other': torch.tensor(3)
         }
 
+        self.ocr_path = load_ocr
+        if load_ocr is not None:
+            self.ocr_results, ocr_vocab = self._load_ocr_results(load_ocr)
+        self.truncate_ocr = truncate_ocr
+        self.max_text_len = max_text_len
+
         if subset:
             N = int(0.1 * len(self.vqa.dataset))
             self.vqa.dataset = random.sample(self.vqa.dataset, N)
+
+    @staticmethod
+    def _load_ocr_results(ocr_path):
+        additional_vocab = set()
+        with open(ocr_path, 'r') as f:
+            ocr_results = json.load(f)  # {image_filename: List[ocr tokens]}
+        f.close()
+        for _, ocr_words in ocr_results.items():
+            additional_vocab.update(ocr_words)
+        return ocr_results, list(additional_vocab)
 
     def __getitem__(self, idx):
         '''Return images, questions, and answers
@@ -115,24 +131,31 @@ class VQA_mm_Dataset(VQADataset):
         image = Image.open(img_fpath).convert("RGB")
         img_tensor = self.preprocess(image)
 
-        # if self.load_ocr:
-        #     with open(self.load_ocr) as ocr_dict:
-        #         ocr = json.load(ocr_dict)[str(image_id)]
-        # else:
-        #     ocr = pytesseract.image_to_string(image)
-        # ocr = OCR_TOKEN + ocr
+        ocr = ""
+        if self.ocr_path is not None and image_id in self.ocr_results:
+            ocr = self.ocr_results[image_id]
+            if self.truncate_ocr:
+                q_len = clip.tokenize(question)[0].count_nonzero().item()
+                # print(clip.tokenize(question))
+                max_ocr_len = max(self.max_text_len - q_len - 1, 0)
+                # if max_ocr_len < len(ocr): print(max_ocr_len, len(ocr))
+                ocr = ocr[:max_ocr_len]
+            if self.truncate_ocr and len(ocr) != 0:
+                ocr = ' ' + OCR_TOKEN + ' ' + ' '.join(ocr)
+            else:
+                ocr = ' '.join(ocr)
+
         # Convert answers and questions to index sequence
         flat_answers = [i['answer'] for i in answers]
         # In case of a tie, pick the first. Might consider pick randomly
         answer = max(flat_answers, key=flat_answers.count)
         a_vec = self._sent_2_idx_seq(answer)
 
-        question = clip.tokenize(question).squeeze(0)
+        question = clip.tokenize(question + ocr).squeeze(0)
         answer = clip.tokenize(answer).squeeze(0)
-        # ocr_tokenized = clip.tokenize(ocr).squeeze(0)
 
         if self.include_q_vector:
-            q_vec = self._sent_2_idx_seq(qa_pair['question'])
+            q_vec = self._sent_2_idx_seq(qa_pair['question'] + ocr)
             # ocr_vec = self._sent_2_idx_seq(ocr) 
             return img_tensor, question, answer, torch.tensor(a_vec, dtype=torch.int), image_id, torch.tensor(q_vec, dtype=torch.int), ans_type
 

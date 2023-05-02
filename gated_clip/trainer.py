@@ -10,7 +10,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 class Trainer(object):
 
-    def __init__(self, model, train_dataloader, val_dataloader, word_to_idx, idx_to_word, learning_rate = 0.001, num_epochs = 10, print_every = 5, verbose = True, device = 'cuda'):
+    def __init__(self, exp_name, model, train_dataloader, val_dataloader, word_to_idx, idx_to_word, learning_rate = 0.001, num_epochs = 10, print_every = 5, verbose = True, device = 'cuda', start_epoch=0):
       
         self.model = model
         self.train_dataloader = train_dataloader
@@ -25,8 +25,9 @@ class Trainer(object):
         self.optim = torch.optim.Adam(self.model.parameters(), self.learning_rate)
         self.word_to_idx = word_to_idx
         self.idx_to_word = idx_to_word
-        self.exp_name = 'gated_clip_1'
+        self.exp_name = exp_name
         self.writer = SummaryWriter(log_dir=f'./runs/{self.exp_name}')
+        self.start_epoch = start_epoch
 
     # answer_type: (B, 1)
     def loss(self, predictions, answers, answer_type):
@@ -67,7 +68,7 @@ class Trainer(object):
         """
         Run optimization to train the model.
         """
-        for i in range(self.num_epochs):
+        for i in range(self.start_epoch, self.num_epochs):
             epoch_loss = 0
             epoch_loss_lang = 0
             epoch_loss_type = 0
@@ -109,7 +110,7 @@ class Trainer(object):
                     'type-loss': val_loss_type
                 }, i)
 
-            torch.save(self.model.state_dict(), f"./model_{self.exp_name}.pth")
+            torch.save(self.model.state_dict(), f"./model_{self.exp_name}_freeze.pth")
 
             # with open('train_loss.npy', 'wb') as f:
             #     np.save(f, self.loss_history)
