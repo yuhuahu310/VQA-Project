@@ -181,10 +181,10 @@ class VQA_mm_Dataset(VQADataset):
                 max_ocr_len = max(self.max_text_len - q_len - 1, 0)
                 # if max_ocr_len < len(ocr): print(max_ocr_len, len(ocr))
                 ocr = ocr[:max_ocr_len]
-            if ocr == "":
-                ocr = ' '.join(ocr)
-            else:
+            if self.truncate_ocr and len(ocr) != 0:
                 ocr = ' ' + OCR_TOKEN + ' ' + ' '.join(ocr)
+            else:
+                ocr = ' '.join(ocr)
         # <sos> questions <ocr> ocr texts <eos>
 
         # Convert answers and questions to index sequence
